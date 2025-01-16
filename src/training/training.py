@@ -58,7 +58,7 @@ def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
             for batch_idx, batch in enumerate(train_dataloader):
                 
                 model.train()
-                model.optimizer.zero_grad()
+                optimizer.zero_grad()
                 
                 train_loss = model_forward(model, batch)
                 train_loss.backward()
