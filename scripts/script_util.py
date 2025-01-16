@@ -29,6 +29,9 @@ def get_model_from_args(args=None):
     model_class = _get_attr_case_insensitive(model_module, model_name)
     model_config_class = _get_attr_case_insensitive(model_module, model_name + 'Config')
     
+    assert model_class is not None, f"Model class {model_name} not found"
+    assert model_config_class is not None, f"Model config class {model_name}Config not found"
+    
     config = model_config_class()    
     
     for parameter in sys.argv[2:]:
