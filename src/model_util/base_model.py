@@ -31,7 +31,7 @@ class BaseConfig:
         assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
 
 class BaseModel(nn.Module):
-    def __init__(self, config: BaseConfig):
+    def __init__(self, config):
         super().__init__()
         self.config = config
         self.name = config.get_name()
