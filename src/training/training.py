@@ -21,6 +21,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None)
     
     # Setup
     model.device = get_device()
+    model.to(model.device)
     model.padding_token = tokenizer.pad_token_id
     
     if checkpoint is not None:
