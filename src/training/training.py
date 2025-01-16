@@ -17,16 +17,16 @@ def model_forward(model, batch):
     _, loss = model(input_ids, target_ids)
     return loss
 
-def train_model(model, dataloaders, checkpoint=None):
+def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
     
     # Setup
     model.device = get_device()
     
     if checkpoint is not None:
-        model.load_state_dict(checkpoint['model_state_dict'])
+        model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
     else:
         checkpoint = {
-            'model_state_dict': None,
+            'model_state_dicts': [],
             'train_losses': [],
             'valid_losses': [],
             'epoch': 0,
@@ -44,6 +44,10 @@ def train_model(model, dataloaders, checkpoint=None):
     print(f'Training model [{model.get_name()}] on device [{model.device}]')
     
     while True:
+        
+        if max_epochs is not None and checkpoint['epoch'] >= max_epochs:
+            print(f'Maximum number of epochs reached ({max_epochs}), stopping training')
+            break
         
         train_loss = 0.0
         valid_loss = 0.0
@@ -77,6 +81,6 @@ def train_model(model, dataloaders, checkpoint=None):
                 pbar.set_postfix_str(f'Train Loss: {train_loss:.4f} | Valid Loss: {valid_loss:.4f} | Time Remaining: {time_remaining}')
                 pbar.update(1)
         
-        checkpoint['epoch'] += 1
-        checkpoint['model_state_dict'] = model.state_dict()
+        checkpoint['model_state_dicts'].append(model.state_dict())
         torch.save(checkpoint, os.path.join(CHECKPOINT_PATH, f'{model.get_name()}_checkpoint.pth'))
+        checkpoint['epoch'] += 1
