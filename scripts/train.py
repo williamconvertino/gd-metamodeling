@@ -15,5 +15,5 @@ if __name__ == "__main__":
     tokenizer = get_tokenizer()
     model.resize_vocabulary(len(tokenizer))
     
-    dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=128)
+    dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
     train_model(model, tokenizer, dataloaders, checkpoint=checkpoint)
