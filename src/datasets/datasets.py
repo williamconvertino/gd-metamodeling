@@ -2,10 +2,9 @@ import os
 from torch.utils.data import DataLoader
 from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk, config
 from transformers import GPT2TokenizerFast
+from util.cache import setup_cache
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), '../../data/datasets')
-
-config.HF_DATASETS_CACHE = os.path.join(os.path.dirname(__file__), '../../data/cache')
 
 def build_dataset_splits(dataset, val_size=10000, test_size=10000):
     if isinstance(dataset, DatasetDict):
