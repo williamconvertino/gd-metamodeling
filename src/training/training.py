@@ -15,11 +15,14 @@ def model_forward(model, batch):
     _, loss = model(input_ids, target_ids, padding_token=model.padding_token)
     return loss
 
-def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None):
+def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None, device=None):
     
     # Setup
-    model.device = get_device()
-    model.to(model.device)
+    if device is None:
+        device = get_device()
+        
+    model.device = device
+    model.to(device)
     model.padding_token = tokenizer.pad_token_id
     
     if checkpoint is not None:
