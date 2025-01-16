@@ -11,7 +11,7 @@ class BaseConfig:
     # Basic Model Parameters
     d_vocab: int = 50258 # Default value for GPT-2 tokenizer
     d_seq: int = 256
-    d_embed: int = 256
+    d_embed: int = 512
     n_head: int = 8
     n_layer: int = 1
 
