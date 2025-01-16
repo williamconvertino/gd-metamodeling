@@ -9,7 +9,7 @@ class BaseConfig:
     model_name: str
 
     # Basic Model Parameters
-    d_vocab: int = 10000
+    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
     d_seq: int = 256
     d_embed: int = 256
     n_head: int = 8
@@ -45,6 +45,11 @@ class BaseModel(nn.Module):
     def get_num_params_formatted(self):
         num_params = self.get_num_params()
         return f"{num_params / 1e6:.2f}M" if num_params > 1e6 else num_params
+
+    def resize_vocabulary(self, d_vocab_new):
+        self.config.d_vocab = d_vocab_new
+        if hasattr(self, 'wte'):
+            self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
     def generate(self, x, max_new_tokens=100, eos_token=None, return_inputs=False):
         
@@ -121,3 +126,5 @@ class BaseModel(nn.Module):
             x = x[:, input_size:]
         
         return x
+    
+    
