@@ -118,8 +118,6 @@ class GPT(BaseModel):
         
         # Output
         self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
-        self.lm_head = nn.Linear(config.d_embed, config.vocab_size, bias=False)
-        self.W_e.weight = self.lm_head.weight # Weight tying
         
         self._init_weights()
         print(f"Initialized model {self.name} with {self.get_num_params_formatted()} parameters")
