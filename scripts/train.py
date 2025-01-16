@@ -15,6 +15,7 @@ if __name__ == "__main__":
     
     flags = get_flags_from_args()
     if 'cache' in flags:
+        print('Setting up cache')
         setup_cache()
     
     tokenizer = get_tokenizer()
