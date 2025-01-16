@@ -12,26 +12,24 @@ def load_checkpoint(model):
         return torch.load(model_path)
     return None
 
-def _init_model(model_name):
-
-  def _get_attr_case_insensitive(module, name):
-    name = name.replace('_', '')
-    for attr in dir(module):
-      if attr.lower() == name.lower():
-        return getattr(module, attr)
-    return None
-
-  model_module = importlib.import_module('src.models.' + model_name.lower())
-  model_class = _get_attr_case_insensitive(model_module, model_name)
-  model_config = _get_attr_case_insensitive(model_module, model_name + 'Config')
-
-  return model_class(), model_config()
-
 def get_model_from_args(args=None):
     if args is None:
         args = sys.argv[1:]
     
-    model, config = _init_model(args[0])
+    def _get_attr_case_insensitive(module, name):
+        name = name.replace('_', '')
+        for attr in dir(module):
+            if attr.lower() == name.lower():
+                return getattr(module, attr)
+            return None
+
+    model_name = args[0]
+
+    model_module = importlib.import_module('src.models.' + model_name.lower())
+    model_class = _get_attr_case_insensitive(model_module, model_name)
+    model_config_class = _get_attr_case_insensitive(model_module, model_name + 'Config')
+    
+    config = model_config_class()    
     
     for parameter in sys.argv[2:]:
         s = parameter.split('=')
@@ -45,7 +43,7 @@ def get_model_from_args(args=None):
                 value = value.lower() == 'true'
                 setattr(config, key, value)
     
-    return model(config)
+    return model_class(config)
 
 def get_flags_from_args(args=None):
     if args is None:
