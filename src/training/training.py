@@ -41,7 +41,7 @@ def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     
     # Training Loop
-    print(f'Training model [{model.get_name()}] on device [{model.device}]')
+    print(f'Training model [{model.config.get_name()}] on device [{model.device}]')
     
     while True:
         
@@ -82,5 +82,5 @@ def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
                 pbar.update(1)
         
         checkpoint['model_state_dicts'].append(model.state_dict())
-        torch.save(checkpoint, os.path.join(CHECKPOINT_PATH, f'{model.get_name()}_checkpoint.pth'))
+        torch.save(checkpoint, os.path.join(CHECKPOINT_PATH, f'{model.config.get_name()}_checkpoint.pth'))
         checkpoint['epoch'] += 1

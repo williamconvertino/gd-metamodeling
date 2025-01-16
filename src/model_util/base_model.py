@@ -34,7 +34,6 @@ class BaseModel(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
-        print(self.config.get_name())
         self.name = config.get_name()
 
     def forward(self, x):
