@@ -1,0 +1,5 @@
+torch
+datasets
+transformers
+tokenizers
+huggingface_hub 
