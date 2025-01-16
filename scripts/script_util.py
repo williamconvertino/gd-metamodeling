@@ -7,7 +7,7 @@ import torch
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/checkpoints')
 
 def load_checkpoint(model):
-    model_path = f'{CHECKPOINT_DIR}/{model.get_name()}_checkpoint.pth'
+    model_path = f'{CHECKPOINT_DIR}/{model.config.get_name()}_checkpoint.pth'
     if os.path.exists(model_path):
         return torch.load(model_path)
     return None
