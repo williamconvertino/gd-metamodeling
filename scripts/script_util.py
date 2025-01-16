@@ -19,6 +19,7 @@ def get_model_from_args(args=None):
     def _get_attr_case_insensitive(module, name):
         name = name.replace('_', '')
         for attr in dir(module):
+            print(attr.lower(), name.lower())
             if attr.lower() == name.lower():
                 return getattr(module, attr)
             return None
