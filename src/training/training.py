@@ -83,5 +83,6 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
                 pbar.update(1)
         
         checkpoint['model_state_dicts'].append(model.state_dict())
+        os.makedirs(CHECKPOINT_PATH, exist_ok=True)
         torch.save(checkpoint, os.path.join(CHECKPOINT_PATH, f'{model.config.get_name()}_checkpoint.pth'))
         checkpoint['epoch'] += 1
