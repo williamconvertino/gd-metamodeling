@@ -26,7 +26,7 @@ def get_model_from_args(args=None):
 
     model_name = args[0]
 
-    model_module = importlib.import_module('src.models.' + model_name.lower())
+    model_module = importlib.import_module('src.models')
     model_class = _get_attr_case_insensitive(model_module, model_name)
     model_config_class = _get_attr_case_insensitive(model_module, model_name + 'Config')
     
