@@ -3,6 +3,8 @@ import time
 def get_time_remaining_formatted(start_time, current_step, total_steps):
     elapsed_time = time.time() - start_time
     steps_remaining = total_steps - current_step
+    if current_step == 0:
+        current_step = 1
     time_remaining = elapsed_time / current_step * steps_remaining
     
     days = time_remaining // 86400
