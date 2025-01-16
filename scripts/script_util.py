@@ -19,16 +19,13 @@ def get_model_from_args(args=None):
     def _get_attr_case_insensitive(module, name):
         name = name.replace('_', '')
         for attr in dir(module):
-            print(attr.lower(), name.lower())
             if attr.lower() == name.lower():
                 return getattr(module, attr)
-            return None
+        return None
 
     model_name = args[0]
 
     model_module = importlib.import_module('src.models')
-    print(model_module)
-    print(dir(model_module))
     model_class = _get_attr_case_insensitive(model_module, model_name)
     model_config_class = _get_attr_case_insensitive(model_module, model_name + 'Config')
     
