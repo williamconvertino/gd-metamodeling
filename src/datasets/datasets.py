@@ -2,7 +2,6 @@ import os
 from torch.utils.data import DataLoader
 from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk, config
 from transformers import GPT2TokenizerFast
-from src.util.cache import setup_cache
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), '../../data/datasets')
 

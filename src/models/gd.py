@@ -1,3 +1,4 @@
+import math
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -77,7 +78,7 @@ class GD(BaseModel):
         if self.gamma is not None:
             nn.init.normal_(self.gamma, mean=1.0, std=0.02)
         for W_o in self.W_o_list:
-            nn.init.normal_(W_o, std=0.02)
+            nn.init.normal_(W_o, std=0.02 / math.sqrt(2 * self.config.n_layer))
         if self.config.A_0 == "learned":
             nn.init.normal_(self.A_0, std=0.02)
         if self.config.use_ff:
