@@ -18,7 +18,7 @@ class GDConfig(BaseConfig):
     A_0: str = "zeros"
     
     def get_name(self):
-        return f"{super().get_name()}_LN_OUT={self.use_ln_out}_FF={self.use_ff}_A_0={self.A_0}"
+        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_LN_OUT={self.use_ln_out}_FF={self.use_ff}_A_0={self.A_0}"
     
     def __post_init__(self):
         super().__post_init__()
