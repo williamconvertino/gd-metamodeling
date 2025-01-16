@@ -13,6 +13,7 @@ class GDConfig(BaseConfig):
     # Model Parameters
     use_ff: bool = False
     use_ln_out: bool = False
+    attn_fn: str = "linear"
     
     # A_0
     A_0: str = "zeros"
