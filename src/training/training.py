@@ -57,7 +57,8 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
         
         with tqdm(total=len(train_dataloader), desc=f"Epoch {checkpoint['epoch']}", unit='batch') as pbar:
             for batch_idx, batch in enumerate(train_dataloader):
-                
+                if batch_idx >= 20:
+                    break
                 model.train()
                 optimizer.zero_grad()
                 
