@@ -9,12 +9,8 @@ if __name__ == "__main__":
     
     torch.manual_seed(0)
     
-    config = GDConfig()
-    print(config.model_name)
-    print(config.get_name())
+    model = get_model_from_args()
+    checkpoint = load_checkpoint(model)
     
-    # model = get_model_from_args()
-    # checkpoint = load_checkpoint(model)
-    
-    # dataloaders = get_dataloaders(d_seq=model.config.d_seq)
-    # train_model(model, dataloaders, checkpoint=checkpoint)
+    dataloaders = get_dataloaders(d_seq=model.config.d_seq)
+    train_model(model, dataloaders, checkpoint=checkpoint)

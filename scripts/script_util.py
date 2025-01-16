@@ -24,6 +24,10 @@ def get_model_class(model_name):
   model_module = importlib.import_module('src.models.' + model_name.lower())
   model_class = _get_attr_case_insensitive(model_module, model_name)
   model_config = _get_attr_case_insensitive(model_module, model_name + 'Config')
+  
+  print(model_config)
+  print(model_config.model_name)
+  print(model_config.get_name())
 
   return model_class, model_config
 
