@@ -3,7 +3,7 @@ from tqdm import tqdm
 import torch
 from src.util import get_device
 
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 WEIGHT_DECAY = 1e-2
 
 CHECKPOINT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/checkpoints')
@@ -36,7 +36,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None)
     train_dataloader = dataloaders['train']
     valid_dataloader = dataloaders['valid']
     
-    num_steps_record = len(train_dataloader) // 1000 # Only saves model losses every 1000 steps for efficiency and memory reasons
+    num_steps_record = len(train_dataloader) // 200 # Only saves model losses every 200 steps for efficiency and memory reasons
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     

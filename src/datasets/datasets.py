@@ -81,7 +81,7 @@ def get_tokenizer():
     tokenizer.name = 'gpt2-tokenizer'
     return tokenizer
 
-def get_dataloaders(d_seq, tokenizer=None, batch_size=32):
+def get_dataloaders(d_seq, tokenizer, batch_size):
     
     dataset = generate_dataset_splits()
     
