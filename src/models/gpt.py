@@ -108,7 +108,7 @@ class GPT(BaseModel):
 
         # Embedding
         self.wte = nn.Embedding(config.d_vocab, config.d_embed)
-        self.wpe = nn.Embedding(config.d_seq, config.d_embed)
+        self.wpe = nn.Embedding(config.d_seq + 1, config.d_embed)
         
         self.dropout_e = nn.Dropout(config.dropout)
         self.dropout_p = nn.Dropout(config.dropout)
