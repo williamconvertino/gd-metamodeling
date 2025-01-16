@@ -12,7 +12,7 @@ def load_checkpoint(model):
         return torch.load(model_path)
     return None
 
-def get_model_class(model_name):
+def _init_model(model_name):
 
   def _get_attr_case_insensitive(module, name):
     name = name.replace('_', '')
@@ -24,18 +24,14 @@ def get_model_class(model_name):
   model_module = importlib.import_module('src.models.' + model_name.lower())
   model_class = _get_attr_case_insensitive(model_module, model_name)
   model_config = _get_attr_case_insensitive(model_module, model_name + 'Config')
-  
-  print(model_config)
-  print(model_config.model_name)
-  print(model_config.get_name())
 
-  return model_class, model_config
+  return model_class(), model_config()
 
 def get_model_from_args(args=None):
     if args is None:
         args = sys.argv[1:]
     
-    model, config = get_model_class(args[0])
+    model, config = _init_model(args[0])
     
     for parameter in sys.argv[2:]:
         s = parameter.split('=')
