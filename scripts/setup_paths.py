@@ -1,5 +1,13 @@
 import os
 import sys
+from script_util import get_flags_from_args, setup_cache
+
+CACHE_DIR = os.path.join(os.path.dirname(__file__), '..', 'cache')
+
+def init_cache():
+    flags = get_flags_from_args()
+    if 'cache' in flags:
+        setup_cache(CACHE_DIR)
 
 # Allows us to import from src
 def add_src_to_path():
@@ -18,3 +26,4 @@ def install_requirements():
     
 add_src_to_path()
 install_requirements()
+init_cache()

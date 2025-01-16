@@ -5,9 +5,6 @@ from script_util import get_model_from_args, load_checkpoint, get_flags_from_arg
 from src.training import train_model
 from src.datasets import get_dataloaders, get_tokenizer
 from src.models import GDConfig
-from src.util.cache import setup_cache
-
-CACHE_DIR = os.path.join(os.path.dirname(__file__), '..', 'cache')
 
 if __name__ == "__main__":
     
@@ -18,8 +15,6 @@ if __name__ == "__main__":
     
     device = None
     flags = get_flags_from_args()
-    if 'cache' in flags:
-        setup_cache(CACHE_DIR)
     if 'cpu' in flags:
         device = torch.device('cpu')
     
