@@ -1,9 +1,7 @@
 import os
-import time
 from tqdm import tqdm
 import torch
-from torch.nn import functional as F
-from src.util import get_device, get_time_remaining_formatted
+from src.util import get_device
 
 LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 1e-2
@@ -54,8 +52,6 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None)
         train_loss = 0.0
         valid_loss = 0.0
         
-        start_time = time.time()
-        
         with tqdm(total=len(train_dataloader), desc=f"Epoch {checkpoint['epoch']}", unit='batch') as pbar:
             for batch_idx, batch in enumerate(train_dataloader):
                 
@@ -79,8 +75,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None)
                     checkpoint['train_losses'].append((current_step, round(train_loss, 4)))
                     checkpoint['valid_losses'].append((current_step, round(valid_loss, 4)))
                 
-                time_remaining = get_time_remaining_formatted(start_time, batch_idx, len(train_dataloader))
-                pbar.set_postfix_str(f'Train Loss: {train_loss:.4f} | Valid Loss: {valid_loss:.4f} | Time Remaining: {time_remaining}')
+                pbar.set_postfix_str(f'Train Loss: {train_loss:.4f} | Valid Loss: {valid_loss:.4f}')
                 pbar.update(1)
         
         checkpoint['model_state_dicts'].append(model.state_dict())
