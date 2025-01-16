@@ -18,7 +18,7 @@ class GDConfig(BaseConfig):
     A_0: str = "zeros"
     
     def get_name(self):
-        return 'Name'
+        return 'name'
         # return f"{super().get_name()}_LN_OUT={self.use_ln_out}_FF={self.use_ff}_A_0={self.A_0}"
     
     def __post_init__(self):
@@ -27,8 +27,6 @@ class GDConfig(BaseConfig):
 
 class GD(BaseModel):
     def __init__(self, config):
-        print(config)
-        print(config.get_name())
         super().__init__(config)
 
         # Embedding
