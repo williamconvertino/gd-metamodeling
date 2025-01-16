@@ -73,7 +73,7 @@ def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
                             valid_loss += model_forward(model, valid_batch).item()
                     valid_loss /= len(valid_dataloader)
                     
-                    current_step = epoch * len(train_dataloader) + batch_idx
+                    current_step = checkpoint['epoch'] * len(train_dataloader) + batch_idx
                     checkpoint['train_losses'].append((current_step, round(train_loss, 4)))
                     checkpoint['valid_losses'].append((current_step, round(valid_loss, 4)))
                 
