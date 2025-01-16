@@ -54,7 +54,7 @@ def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
         
         start_time = time.time()
         
-        with tqdm(total=len(train_dataloader), desc=f'Epoch {checkpoint['epoch']}', unit='batch') as pbar:
+        with tqdm(total=len(train_dataloader), desc=f"Epoch {checkpoint['epoch']}", unit='batch') as pbar:
             for batch_idx, batch in enumerate(train_dataloader):
                 
                 model.train()
