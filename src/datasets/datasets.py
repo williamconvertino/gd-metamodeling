@@ -75,14 +75,19 @@ def generate_dataset_splits():
     
     return combined_datasets
 
+def get_tokenizer():
+    tokenizer = GPT2TokenizerFast.from_pretrained('openai-community/gpt2')
+    tokenizer.add_special_tokens({'pad_token': '<|pad|>'})        
+    tokenizer.name = 'gpt2-tokenizer'
+    return tokenizer
+
 def get_dataloaders(d_seq, tokenizer=None, batch_size=32):
     
     dataset = generate_dataset_splits()
     
     if tokenizer is None:
-        tokenizer = GPT2TokenizerFast.from_pretrained('openai-community/gpt2')
-        tokenizer.add_special_tokens({'pad_token': '<|pad|>'})        
-    
+        tokenizer = get_tokenizer()
+        
     def collate_fn(examples):
         texts = [example['text'] for example in examples]
         return tokenizer(texts, padding=True, truncation=True, max_length=d_seq, return_tensors='pt')

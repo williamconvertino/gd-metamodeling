@@ -11,16 +11,17 @@ WEIGHT_DECAY = 1e-2
 CHECKPOINT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/checkpoints')
 
 def model_forward(model, batch):
-    sequence = batch.to(model.device)
+    sequence = batch['input_ids'].to(model.device)
     input_ids = sequence[:, :-1]
     target_ids = sequence[:, 1:]
-    _, loss = model(input_ids, target_ids)
+    _, loss = model(input_ids, target_ids, padding_token=model.padding_token)
     return loss
 
-def train_model(model, dataloaders, checkpoint=None, max_epochs=None):
+def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None):
     
     # Setup
     model.device = get_device()
+    model.padding_token = tokenizer.pad_token_id
     
     if checkpoint is not None:
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
