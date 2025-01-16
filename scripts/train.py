@@ -1,6 +1,6 @@
 import setup_paths
 import torch
-from script_util import get_model_from_args, get_tokenizer_and_dataset_from_args, load_checkpoint
+from script_util import get_model_from_args, load_checkpoint
 from src.training import train_model
 from src.datasets import get_dataloaders
 
