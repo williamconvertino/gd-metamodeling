@@ -19,7 +19,6 @@ if __name__ == "__main__":
     device = None
     flags = get_flags_from_args()
     if 'cache' in flags:
-        print('Setting up local cache')
         setup_cache(CACHE_DIR)
     if 'cpu' in flags:
         device = torch.device('cpu')
