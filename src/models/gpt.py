@@ -41,9 +41,9 @@ class Attention(nn.Module):
         self._init_weights()
 
     def _init_weights(self):
-        nn.init.normal_(self.W_q.weight, std=0.02)
-        nn.init.normal_(self.W_k.weight, std=0.02)
-        nn.init.normal_(self.W_v.weight, std=0.02)
+        nn.init.normal_(self.W_q, std=0.02)
+        nn.init.normal_(self.W_k, std=0.02)
+        nn.init.normal_(self.W_v, std=0.02)
         if self.gamma is not None:
             nn.init.normal_(self.gamma, mean=1.0, std=0.02)
         nn.init.normal_(self.W_o.weight, std=0.02 / math.sqrt(2 * self.config.n_layer))
