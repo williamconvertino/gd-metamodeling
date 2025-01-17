@@ -121,7 +121,9 @@ class BaseModel(nn.Module):
             
             # Remove n-grams
             if ngram_removal is not None:
-                new_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_removal)]
+                ngram_removed_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_removal)]
+                if len(ngram_removed_sequences) > 0:
+                    new_sequences = ngram_removed_sequences
             
             # Select beam based on normalized score
             new_sequences.sort(key=lambda seq: seq['score'] / (len(seq['x'][0]) + 1), reverse=True)
