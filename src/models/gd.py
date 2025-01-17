@@ -141,7 +141,7 @@ class GD(BaseModel):
         
         # Output
         if targets is None:
-            f_k = f_k[:, [-1]:, :] # Only consider last token for optimized generation
+            f_k = f_k[:, [-1], :] # Only consider last token for optimized generation
         else:
             f_k = f_k[:, 1:, :]
             
