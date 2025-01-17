@@ -95,7 +95,7 @@ class GD(BaseModel):
         
         return numerator / denominator
     
-    def forward(self, x, targets=None, padding_token=None):
+    def forward(self, x, targets=None, pad_token_id=None):
         
         B, S = x.size()
         device = x.device
@@ -156,6 +156,6 @@ class GD(BaseModel):
         if targets is None:
             return logits, None
 
-        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=padding_token)
+        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=pad_token_id)
         
         return logits, loss

@@ -12,7 +12,7 @@ def model_forward(model, batch):
     sequence = batch['input_ids'].to(model.device)
     input_ids = sequence[:, :-1]
     target_ids = sequence[:, 1:]
-    _, loss = model(input_ids, target_ids, padding_token=model.padding_token)
+    _, loss = model(input_ids, target_ids, pad_token_id=model.pad_token_id)
     return loss
 
 def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None, device=None):
@@ -23,7 +23,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
         
     model.device = device
     model.to(device)
-    model.padding_token = tokenizer.pad_token_id
+    model.pad_token_id = tokenizer.pad_token_id
     
     if checkpoint is not None:
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])

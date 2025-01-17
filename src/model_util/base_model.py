@@ -51,7 +51,7 @@ class BaseModel(nn.Module):
         if hasattr(self, 'wte'):
             self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
-    def generate(self, x, max_new_tokens=100, eos_token=None, return_inputs=False):
+    def generate(self, x, max_new_tokens=100, eos_token_id=None, return_inputs=False):
         
         input_size = x.size(1)
 
@@ -61,7 +61,7 @@ class BaseModel(nn.Module):
             x_new = torch.argmax(logits[:, -1, :], dim=-1).unsqueeze(-1)
             x = torch.cat((x, x_new), dim=1)
         
-            if eos_token is not None and x_new.item() == eos_token:
+            if eos_token_id is not None and x_new.item() == eos_token_id:
                 break
 
         if not return_inputs:
@@ -69,7 +69,7 @@ class BaseModel(nn.Module):
         
         return x
 
-    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token=None, return_inputs=False):
+    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, return_inputs=False):
         
         input_size = x.size(1)
 
@@ -98,7 +98,7 @@ class BaseModel(nn.Module):
                     next_idx = topk.indices[0, i].unsqueeze(0).unsqueeze(0)
                     next_score = topk.values[0, i].item()
                     
-                    if next_idx == eos_token:
+                    if next_idx == eos_token_id:
                         eos = True
                     else:
                         x = torch.cat((x, next_idx), dim=1)
