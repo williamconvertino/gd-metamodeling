@@ -29,7 +29,7 @@ class BaseConfig:
     train_dataset: Optional[str] = None
     
     def get_name(self):
-        name = f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
+        name = f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}"
         if self.train_dataset is not None:
             name += f"_ds={self.train_dataset}"
         return name
