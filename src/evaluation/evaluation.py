@@ -72,5 +72,8 @@ def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generatio
             num_sequence += 1
             if num_sequence >= num_generations:
                 break
+        
+        if num_sequence >= num_generations:
+                break
     
     print(f'Generated {num_sequence} sequences ({num_failed} failed)')
