@@ -69,7 +69,7 @@ class BaseModel(nn.Module):
         
         return x
 
-    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, return_inputs=False):
+    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, ngram_removal=3):
         
         input_size = x.size(1)
 
@@ -110,6 +110,19 @@ class BaseModel(nn.Module):
                         'eos': eos
                     })
                 
+            def has_repeated_ngram(sequence, n):
+                ngrams = set()
+                for i in range(len(sequence) - n + 1):
+                    ngram = tuple(sequence[i:i + n].tolist())
+                    if ngram in ngrams:
+                        return True
+                    ngrams.add(ngram)
+                return False
+            
+            # Remove n-grams
+            if ngram_removal is not None:
+                new_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_removal)]
+            
             # Select beam based on normalized score
             new_sequences.sort(key=lambda seq: seq['score'] / (len(seq['x'][0]) + 1), reverse=True)
             beams = new_sequences[:num_beams]
@@ -122,9 +135,5 @@ class BaseModel(nn.Module):
         
         x = most_probable_sequence['x']
 
-        if not return_inputs:
-            x = x[:, input_size:]
-        
-        return x
-    
+        return x[:, input_size:]
     
