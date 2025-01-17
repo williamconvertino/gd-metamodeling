@@ -26,12 +26,12 @@ class BaseConfig:
     dropout: float = 0.1
     
     # Misc
-    dataset: Optional[str] = None
+    train_dataset: Optional[str] = None
     
     def get_name(self):
         name = f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
-        if self.dataset is not None:
-            name += f"_ds={self.dataset}"
+        if self.train_dataset is not None:
+            name += f"_ds={self.train_dataset}"
         return name
     
     def __post_init__(self):
