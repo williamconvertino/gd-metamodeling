@@ -40,21 +40,22 @@ def get_model_from_args(args=None):
             continue
         key, value = s
         
-        def get_all_fields(cls):
+        def get_all_fields(dataclass):
+            # Return all fields of a dataclass, including those of parent classes
             fields_list = []
-            
-            # Traverse the class hierarchy using the method resolution order (MRO)
-            for base_cls in cls.__mro__:
-                if is_dataclass(base_cls):  # Only consider dataclasses
-                    fields_list.extend(fields(base_cls))
-            
-            return fields_list
+            for field in fields(dataclass):
+                fields_list.append(field)
+            for base_class in dataclass.__bases__:
+                if is_dataclass(base_class):
+                    fields_list += get_all_fields(base_class)
         
         if key in [field.name for field in get_all_fields(model_config_class)]:
             if type(getattr(config, key)) == int:
                 value = int(value)
             elif type(getattr(config, key)) == bool:
                 value = value.lower() == 'true'
+                setattr(config, key, value)
+            else:
                 setattr(config, key, value)
     
     return model_class(config)
