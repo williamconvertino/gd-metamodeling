@@ -46,7 +46,7 @@ def get_model_from_args(args=None):
                 fields_list += fields(cls)
             return fields_list
         
-        if key in [field.name for field in get_all_fields(config)]:
+        if key in [field.name for field in get_all_fields(model_config_class)]:
             if type(getattr(config, key)) == int:
                 value = int(value)
             elif type(getattr(config, key)) == bool:
