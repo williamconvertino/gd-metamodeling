@@ -48,6 +48,7 @@ def get_model_from_args(args=None):
             for base_class in dataclass.__bases__:
                 if is_dataclass(base_class):
                     fields_list += get_all_fields(base_class)
+            return fields_list
         
         if key in [field.name for field in get_all_fields(model_config_class)]:
             if type(getattr(config, key)) == int:
