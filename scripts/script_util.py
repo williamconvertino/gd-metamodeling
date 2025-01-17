@@ -41,10 +41,13 @@ def get_model_from_args(args=None):
         key, value = s
         
         def get_all_fields(cls):
-            fields_list = []
-            for base_cls in cls.__mro__:
-                if is_dataclass(base_cls):
-                    fields_list.extend(fields(base_cls))
+            if not is_dataclass(cls):
+                return []
+            
+            fields_list = list(fields(cls))  
+            for base_cls in cls.__bases__: 
+                fields_list.extend(get_all_fields(base_cls))
+            
             return fields_list
         
         if key in [field.name for field in get_all_fields(model_config_class)]:
