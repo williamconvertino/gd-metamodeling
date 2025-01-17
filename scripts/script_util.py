@@ -52,13 +52,13 @@ def get_model_from_args(args=None):
         # Check all fields in the hierarchy
         all_fields = {field.name for field in get_all_fields(model_config_class)}
         if key in all_fields:
-            # Infer and cast the value to the appropriate type
-            current_value = getattr(config, key, None)
-            if isinstance(current_value, int):
+            if type(getattr(config, key)) == int:
                 value = int(value)
-            elif isinstance(current_value, bool):
+            elif type(getattr(config, key)) == bool:
                 value = value.lower() == 'true'
-            setattr(config, key, value)
+                setattr(config, key, value)
+            else:
+                setattr(config, key, value)
     
     return model_class(config)
 
