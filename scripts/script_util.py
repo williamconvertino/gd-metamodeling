@@ -41,12 +41,12 @@ def get_model_from_args(args=None):
         key, value = s
         
         def get_all_fields(cls):
-            if not is_dataclass(cls):
-                return []
+            fields_list = []
             
-            fields_list = list(fields(cls))  
-            for base_cls in cls.__bases__: 
-                fields_list.extend(get_all_fields(base_cls))
+            # Traverse the class hierarchy using the method resolution order (MRO)
+            for base_cls in cls.__mro__:
+                if is_dataclass(base_cls):  # Only consider dataclasses
+                    fields_list.extend(fields(base_cls))
             
             return fields_list
         
