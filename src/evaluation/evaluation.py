@@ -39,7 +39,7 @@ def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generatio
     
     test_dataset = dataloaders['test']
     
-    print(f'Evaluating model [{model.config.get_name()}] ({model.config.attn_fn}) with [{checkpoint["epoch"]}] on device [{model.device}]')
+    print(f'Evaluating model [{model.config.get_name()}] with [{checkpoint["epoch"]}] on device [{model.device}]')
     
     num_sequence = 0
     num_failed = 0
