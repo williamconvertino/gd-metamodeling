@@ -40,12 +40,11 @@ def get_model_from_args(args=None):
             continue
         key, value = s
         
-        def get_all_fields(cls):
-            all_fields = []
-            for c in cls.__mro__:
-                if hasattr(c, "__dataclass_fields__"):
-                    all_fields.extend(fields(c))
-            return all_fields
+        def get_all_fields(x):
+            fields_list = []
+            for cls in x.__mro__:
+                fields_list += fields(cls)
+            return fields_list
         
         if key in [field.name for field in get_all_fields(config)]:
             if type(getattr(config, key)) == int:
