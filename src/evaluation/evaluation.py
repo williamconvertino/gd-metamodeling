@@ -44,7 +44,7 @@ def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generatio
     
     for batch in test_dataset:
         for i in range(batch['input_ids'].size(0)):
-            sequence = batch[i, :].tolist()
+            sequence = batch['input_ids'][i, :].tolist()
             
             end_padding_index = sequence.index(tokenizer.pad_token_id)
             sequence = sequence[:end_padding_index]
