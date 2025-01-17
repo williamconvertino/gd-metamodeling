@@ -16,9 +16,11 @@ def generate_ending(model, sequence, use_beam=True):
         input = sequence.to(model.device)
     
         if use_beam:
-            return model.beam_search(input, max_new_tokens=100, num_beams=3, eos_token_id=model.eos_token_id)
+            output = model.beam_search(input, max_new_tokens=100, num_beams=3, eos_token_id=model.eos_token_id)
+        else:
+            output = model.generate(input, max_new_tokens=100, eos_token_id=model.eos_token_id)
         
-        return model.generate(input, max_new_tokens=100, eos_token_id=model.eos_token_id)
+        return output[0].tolist()
     
 def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generations=2, device=None):
     
