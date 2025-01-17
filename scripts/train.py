@@ -21,6 +21,8 @@ if __name__ == "__main__":
     tokenizer = get_tokenizer()
     model.resize_vocabulary(len(tokenizer))
     
+    print("AHHHHHHHHHHHHHH")
+    print(model.config.train_dataset)
     if model.config.train_dataset == 'tiny_stories':
         dataset_list = ['tiny_stories']
     elif model.config.train_dataset == 'children_stories':
