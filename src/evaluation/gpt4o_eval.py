@@ -5,7 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 
-from src.util import get_time_remaining
+from src.util import get_time_remaining_formatted
 
 INPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/evaluations/input')
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/evaluations/output')
@@ -160,7 +160,7 @@ def generate_gpt4o_inputs(model, tokenizer, test_dataset, num_generations=10):
       eval_items.append(get_request_object(f"request_{i}_beam", beam_prompt))
       
       i += 1
-      time_remaining = get_time_remaining(start_time, i, num_generations)
+      time_remaining = get_time_remaining_formatted(start_time, i, num_generations)
       print(f"\r{i}/{num_generations} ({100 * i / num_generations:.2f}%) | Time Remaining: {time_remaining}", end='')
     
   os.makedirs(INPUT_DIR, exist_ok=True)
