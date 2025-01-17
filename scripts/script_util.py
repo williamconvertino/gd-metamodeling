@@ -2,6 +2,7 @@ import os
 import sys
 import importlib
 import torch
+from dataclasses import fields
 
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/checkpoints')
 
@@ -40,11 +41,11 @@ def get_model_from_args(args=None):
         key, value = s
         
         def get_all_fields(cls):
-            fields = []
+            all_fields = []
             for c in cls.__mro__:
                 if hasattr(c, "__dataclass_fields__"):
-                    fields.extend(fields(c))
-            return fields
+                    all_fields.extend(fields(c))
+            return all_fields
         
         if key in [field.name for field in get_all_fields(model_config_class)]:
             if type(getattr(config, key)) == int:
