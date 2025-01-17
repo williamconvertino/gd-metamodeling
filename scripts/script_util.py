@@ -2,7 +2,7 @@ import os
 import sys
 import importlib
 import torch
-from dataclasses import fields
+from dataclasses import fields, is_dataclass
 
 CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/checkpoints')
 
@@ -40,10 +40,11 @@ def get_model_from_args(args=None):
             continue
         key, value = s
         
-        def get_all_fields(x):
+        def get_all_fields(cls):
             fields_list = []
-            for cls in x.__mro__:
-                fields_list += fields(cls)
+            for base_cls in cls.__mro__:
+                if is_dataclass(base_cls):
+                    fields_list.extend(fields(base_cls))
             return fields_list
         
         if key in [field.name for field in get_all_fields(model_config_class)]:
