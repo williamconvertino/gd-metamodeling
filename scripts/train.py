@@ -17,6 +17,8 @@ if __name__ == "__main__":
     flags = get_flags_from_args()
     if 'cpu' in flags:
         device = torch.device('cpu')
+        
+    print(model.config)
     
     tokenizer = get_tokenizer()
     model.resize_vocabulary(len(tokenizer))
