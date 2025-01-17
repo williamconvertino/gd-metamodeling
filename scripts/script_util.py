@@ -45,7 +45,7 @@ def get_model_from_args(args=None):
                 fields += base.__dict__.keys()
             return fields
         
-        if key in [f.name for f in get_all_fields(model_config_class)]:
+        if key in get_all_fields(model_config_class):
             if type(getattr(config, key)) == int:
                 value = int(value)
             elif type(getattr(config, key)) == bool:
