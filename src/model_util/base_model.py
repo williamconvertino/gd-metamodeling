@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import torch
 import torch.nn as nn
+from typing import Optional
 
 @dataclass
 class BaseConfig:
@@ -24,8 +25,14 @@ class BaseConfig:
     # Regularization and Normalization
     dropout: float = 0.1
     
+    # Misc
+    train_dataset: Optional[str] = None
+    
     def get_name(self):
-        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
+        name = f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
+        if self.train_dataset is not None:
+            name += f"_ds={self.train_dataset}"
+        return name
     
     def __post_init__(self):
         assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"

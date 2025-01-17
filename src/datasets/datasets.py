@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import DataLoader
-from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk, config
+from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk
 from transformers import GPT2TokenizerFast
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), '../../data/datasets')
@@ -59,12 +59,13 @@ def generate_children_stories_dataset():
     dataset.save_to_disk(file_path)
     return dataset
 
-def generate_dataset_splits():
+def generate_dataset_splits(dataset_list):
     
-    datasets = [
-        generate_tiny_stories_dataset(),
-        generate_children_stories_dataset()
-    ]
+    datasets = []
+    if 'tiny_stories' in dataset_list:
+        datasets.append(generate_tiny_stories_dataset())
+    if 'children_stories' in dataset_list:
+        datasets.append(generate_children_stories_dataset())
     
     combined_datasets = DatasetDict({
         'train': concatenate_datasets([dataset['train'] for dataset in datasets]).shuffle(),
@@ -80,9 +81,9 @@ def get_tokenizer():
     tokenizer.name = 'gpt2-tokenizer'
     return tokenizer
 
-def get_dataloaders(d_seq, tokenizer, batch_size):
+def get_dataloaders(d_seq, tokenizer, batch_size, dataset_list=['tiny_stories', 'children_stories']):
     
-    dataset = generate_dataset_splits()
+    dataset = generate_dataset_splits(dataset_list)
     
     if tokenizer is None:
         tokenizer = get_tokenizer()
