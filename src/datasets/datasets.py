@@ -66,6 +66,10 @@ def generate_dataset_splits(dataset_list):
         datasets.append(generate_tiny_stories_dataset())
     if 'children_stories' in dataset_list:
         datasets.append(generate_children_stories_dataset())
+        
+    print(len(datasets))
+    for dataset in datasets:
+        print(len(dataset['train']), len(dataset['valid']), len(dataset['test']))
     
     combined_datasets = DatasetDict({
         'train': concatenate_datasets([dataset['train'] for dataset in datasets]).shuffle(),
@@ -83,6 +87,7 @@ def get_tokenizer():
 
 def get_dataloaders(d_seq, tokenizer, batch_size, dataset_list=['tiny_stories', 'children_stories']):
     
+    print(dataset_list)
     dataset = generate_dataset_splits(dataset_list)
     
     if tokenizer is None:
