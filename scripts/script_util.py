@@ -9,7 +9,7 @@ CHECKPOINT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../da
 def load_checkpoint(model):
     model_path = f'{CHECKPOINT_DIR}/{model.config.get_name()}_checkpoint.pth'
     if os.path.exists(model_path):
-        return torch.load(model_path)
+        return torch.load(model_path, weights_only=False)
     return None
 
 def get_model_from_args(args=None):
