@@ -46,8 +46,8 @@ def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generatio
         for i in range(batch['input_ids'].size(0)):
             sequence = batch['input_ids'][i, :].tolist()
             
-            end_padding_index = sequence.index(tokenizer.pad_token_id)
-            sequence = sequence[:end_padding_index]
+            if tokenizer.pad_token_id in sequence:
+                sequence = sequence[:sequence.index(tokenizer.pad_token_id)]
             
             sequence_length = len(sequence)
             if sequence_length < 2:
