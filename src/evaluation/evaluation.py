@@ -22,7 +22,7 @@ def generate_ending(model, sequence, use_beam=True):
         
         return output[0].tolist()
     
-def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generations=2, device=None):
+def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generations=20, device=None):
     
     # Setup
     if device is None:
