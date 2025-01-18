@@ -13,14 +13,13 @@ class GDConfig(BaseConfig):
     
     # Model Parameters
     use_ff: bool = False
-    use_ln_out: bool = False
     attn_fn: str = "linear"
     
     # A_0
     A_0: str = "zeros"
     
     def get_name(self):
-        return f"{super().get_name()}_LN_OUT={self.use_ln_out}_FF={self.use_ff}_A_0={self.A_0}"
+        return f"{super().get_name()}_FF={self.use_ff}_A_0={self.A_0}"
     
     def __post_init__(self):
         super().__post_init__()
@@ -33,6 +32,9 @@ class GD(BaseModel):
         # Embedding
         self.wte = nn.Embedding(config.d_vocab, config.d_embed)
         self.wpe = nn.Embedding(config.d_seq + 1, config.d_embed)
+        
+        self.wte_layernorm = nn.LayerNorm(config.d_embed, bias=False)
+        self.wpe_layernorm = nn.LayerNorm(config.d_embed, bias=False)
         
         # Attention
         self.W_q_diag = self.W_k_diag = nn.Parameter(torch.zeros(config.n_head, config.d_embed)) # W_q = W_k and is diagonal
@@ -64,8 +66,7 @@ class GD(BaseModel):
             )
 
         # Output
-        if config.use_ln_out:
-            self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
+        self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
 
         self._init_weights()
         print(f"Initialized model {self.name} with {self.get_num_params_formatted()} parameters")
@@ -103,6 +104,9 @@ class GD(BaseModel):
         # Embedding
         e = self.wte(x)
         p = self.wpe(torch.arange(S + 1, device=device)).repeat(B, 1, 1)
+        
+        e = self.wte_layernorm(e)
+        p = self.wpe_layernorm(p)
         
         # Attention
         x_i = p[:, :-1, :].repeat(1, 1, self.config.n_head).view(B, S, self.config.n_head, self.config.d_embed).transpose(1, 2)
@@ -146,12 +150,11 @@ class GD(BaseModel):
             f_k = f_k[:, 1:, :]
             
         if self.config.use_ff:
-            f_k = self.ff(f_k)
+            f_k = f_k + self.ff(f_k)
             
-        if self.config.use_ln_out:
-            f_k = self.ln_out(f_k)
+        f_k = self.ln_out(f_k)
         
-        logits = f_k @ self.wte.weight.transpose(-1, -2)
+        logits = f_k @ self.wte_layernorm(self.wte.weight.transpose(-1, -2)) # Layernorm on wte output is not strictly necessary, but it makes the layernorm on e more consistent with GD theory
         
         if targets is None:
             return logits, None

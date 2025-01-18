@@ -13,7 +13,6 @@ class GPTConfig(BaseConfig):
     
     # Model Parameters
     use_ff: bool = True
-    use_ln_out: bool = True
     attn_fn: str = "softmax"
     
     def get_name(self):
@@ -114,6 +113,8 @@ class GPT(BaseModel):
         self.wte = nn.Embedding(config.d_vocab, config.d_embed)
         self.wpe = nn.Embedding(config.d_seq, config.d_embed)
         
+        self.x_layernorm = nn.LayerNorm(config.d_embed, bias=False)
+        
         self.dropout_e = nn.Dropout(config.dropout)
         self.dropout_p = nn.Dropout(config.dropout)
         
@@ -144,12 +145,13 @@ class GPT(BaseModel):
         
         x = e + p
         
+        x = self.x_layernorm(x)
+        
         # Attention
         for block in self.attn_blocks:
             x = block(x)
         
-        if self.config.use_ln_out:
-            x = self.ln_out(x)
+        x = self.ln_out(x)
         
         logits = x @ self.wte.weight.transpose(-1, -2)
         
