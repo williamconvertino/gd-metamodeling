@@ -154,7 +154,7 @@ class GD(BaseModel):
             
         f_k = self.ln_out(f_k)
         
-        logits = f_k @ self.wte_layernorm(self.wte.weight.transpose(-1, -2)) # Layernorm on wte output is not strictly necessary, but it makes the layernorm on e more consistent with GD theory
+        logits = f_k @ self.wte_layernorm(self.wte.weight).transpose(-1, -2) # Layernorm on wte output is not strictly necessary, but it makes the layernorm on e more consistent with GD theory
         
         if targets is None:
             return logits, None
