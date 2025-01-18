@@ -6,18 +6,32 @@ from dataclasses import dataclass
 from src.model_util import BaseModel, BaseConfig, calculate_attn_scores
 
 @dataclass
-class GPTConfig(BaseConfig):
+class GPTConfig:
     
     # Model Name
     model_name: str = "GPT"
+    
+    # Basic Model Parameters
+    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
+    d_seq: int = 256
+    d_embed: int = 512
+    n_head: int = 8
+    n_layer: int = 1
     
     # Model Parameters
     use_ff: bool = True
     attn_fn: str = "softmax"
     
+    # Regularization and Normalization
+    dropout: float = 0.1
+    
     def get_name(self):
-        return f"{super().get_name()}_FF={self.use_ff}"
-
+        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}"
+    
+    def __post_init__(self):
+        super().__post_init__()
+        assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
+        
 class Attention(nn.Module):
 
     def __init__(self, config):

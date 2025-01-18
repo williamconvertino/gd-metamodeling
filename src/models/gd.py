@@ -6,10 +6,17 @@ from dataclasses import dataclass
 from src.model_util import BaseModel, BaseConfig, calculate_attn_scores
 
 @dataclass
-class GDConfig(BaseConfig):
+class GDConfig:
     
     # Model Name
     model_name: str = "GD"
+
+    # Basic Model Parameters
+    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
+    d_seq: int = 256
+    d_embed: int = 512
+    n_head: int = 8
+    n_layer: int = 1
     
     # Model Parameters
     use_ff: bool = False
@@ -17,13 +24,21 @@ class GDConfig(BaseConfig):
     
     # A_0
     A_0: str = "zeros"
+
+
+    # Attention
+    attn_fn: str = "softmax"
+
+    # Regularization and Normalization
+    dropout: float = 0.1
     
     def get_name(self):
-        return f"{super().get_name()}_FF={self.use_ff}_A_0={self.A_0}"
+        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}_A_0={self.A_0}"
     
     def __post_init__(self):
         super().__post_init__()
         assert self.A_0 in ["zeros", "learned", "e_transformation"], f"Invalid A_0 ({self.A_0}), must be one of ['zeros', 'learned', 'e_transformation']"
+        assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
 
 class GD(BaseModel):
     def __init__(self, config):

@@ -3,34 +3,6 @@ import torch
 import torch.nn as nn
 from typing import Optional
 
-@dataclass
-class BaseConfig:
-
-    # Model Name
-    model_name: str
-
-    # Basic Model Parameters
-    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
-    d_seq: int = 256
-    d_embed: int = 512
-    n_head: int = 8
-    n_layer: int = 1
-
-    # Attention
-    attn_fn: str = "softmax"
-
-    # Additional Mechanisms
-    use_ff: bool = True
-
-    # Regularization and Normalization
-    dropout: float = 0.1
-    
-    def get_name(self):
-        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}"
-    
-    def __post_init__(self):
-        assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
-
 class BaseModel(nn.Module):
     def __init__(self, config):
         super().__init__()
