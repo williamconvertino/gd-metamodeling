@@ -130,7 +130,7 @@ class GPT(BaseModel):
         nn.init.normal_(self.wte.weight, std=0.02)
         nn.init.normal_(self.wpe.weight, std=0.02)
         
-    def forward(self, x, targets=None, padding_token=None):
+    def forward(self, x, targets=None, pad_token_id=None):
         
         B, S = x.size()
         device = x.device
@@ -157,6 +157,6 @@ class GPT(BaseModel):
         if targets is None:
             return logits, None
 
-        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=padding_token)
+        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=pad_token_id)
         
         return logits, loss
