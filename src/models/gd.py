@@ -36,7 +36,6 @@ class GDConfig:
         return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}_A_0={self.A_0}"
     
     def __post_init__(self):
-        super().__post_init__()
         assert self.A_0 in ["zeros", "learned", "e_transformation"], f"Invalid A_0 ({self.A_0}), must be one of ['zeros', 'learned', 'e_transformation']"
         assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
 
