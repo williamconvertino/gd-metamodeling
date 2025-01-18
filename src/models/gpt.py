@@ -16,7 +16,7 @@ class GPTConfig(BaseConfig):
     attn_fn: str = "softmax"
     
     def get_name(self):
-        return f"{super().get_name()}_LN_OUT={self.use_ln_out}_FF={self.use_ff}"
+        return f"{super().get_name()}_FF={self.use_ff}"
 
 class Attention(nn.Module):
 
@@ -53,7 +53,6 @@ class Attention(nn.Module):
         
         x = self.ln(x)
         x = x.repeat(1, 1, self.config.n_head).view(B, S, self.config.n_head, self.config.d_embed).transpose(1, 2)
-        
         
         Q = x @ self.W_q
         K = x @ self.W_k
