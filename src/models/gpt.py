@@ -29,7 +29,6 @@ class GPTConfig:
         return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}"
     
     def __post_init__(self):
-        super().__post_init__()
         assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
         
 class Attention(nn.Module):
