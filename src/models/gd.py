@@ -22,10 +22,6 @@ class GDConfig:
     use_ff: bool = False
     attn_fn: str = "linear"
     
-    # A_0
-    A_0: str = "zeros"
-
-
     # Attention
     attn_fn: str = "softmax"
 
@@ -33,10 +29,9 @@ class GDConfig:
     dropout: float = 0.1
     
     def get_name(self):
-        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}_A_0={self.A_0}"
+        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}"
     
     def __post_init__(self):
-        assert self.A_0 in ["zeros", "learned", "e_transformation"], f"Invalid A_0 ({self.A_0}), must be one of ['zeros', 'learned', 'e_transformation']"
         assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
 
 class GD(BaseModel):
@@ -54,9 +49,6 @@ class GD(BaseModel):
         self.W_q_diag = self.W_k_diag = nn.Parameter(torch.zeros(config.n_head, config.d_embed)) # W_q = W_k and is diagonal
         
         # Gradient Descent
-        
-        if config.A_0 == "learned":
-            self.A_0 = nn.Parameter(torch.zeros(config.d_embed, config.d_embed))
         
         self.W_o_list = nn.ParameterList([nn.Parameter(torch.zeros(config.d_embed * config.n_head, config.d_embed)) for _ in range(config.n_layer)])
         
@@ -94,8 +86,6 @@ class GD(BaseModel):
             nn.init.normal_(self.gamma, mean=1.0, std=0.02)
         for W_o in self.W_o_list:
             nn.init.normal_(W_o, std=0.02 / math.sqrt(2 * self.config.n_layer))
-        if self.config.A_0 == "learned":
-            nn.init.normal_(self.A_0, std=0.02)
         if self.config.use_ff:
             nn.init.normal_(self.ff[1].weight, std=0.02)
             nn.init.normal_(self.ff[3].weight, std=0.02)
@@ -137,10 +127,7 @@ class GD(BaseModel):
         
         # Gradient Descent
         
-        if self.config.A_0 == "zeros":
-            f_k = torch.zeros((B, S + 1, self.config.d_embed), device=device)
-        elif self.config.A_0 == "learned":
-            f_k = self.A_0 @ p
+        f_k = torch.zeros((B, S + 1, self.config.d_embed), device=device) # A_0 = 0
         
         for k in range(self.config.n_layer):
             
