@@ -21,9 +21,6 @@ class GDConfig:
     # Model Parameters
     use_ff: bool = False
     attn_fn: str = "linear"
-    
-    # Attention
-    attn_fn: str = "softmax"
 
     # Regularization and Normalization
     dropout: float = 0.1
