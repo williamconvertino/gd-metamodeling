@@ -12,6 +12,8 @@ if __name__ == "__main__":
     model = get_model_from_args()
     checkpoint = load_checkpoint(model)
     
+    assert checkpoint is not None, "No checkpoint found"
+    
     device = None
     flags = get_flags_from_args()
     if 'cpu' in flags:
