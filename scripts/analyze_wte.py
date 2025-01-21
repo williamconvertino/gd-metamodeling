@@ -19,6 +19,7 @@ if __name__ == "__main__":
     if 'cpu' in flags:
         device = torch.device('cpu')
     
+    print(checkpoint.keys())
     model.load_state_dict(checkpoint['model_state_dict'])
     
     wte = model.wte.weight
