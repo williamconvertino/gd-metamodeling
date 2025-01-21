@@ -17,7 +17,6 @@ if __name__ == "__main__":
         device = torch.device('cpu')
     
     tokenizer = get_tokenizer()
-    model.resize_vocabulary(len(tokenizer))
     
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
     evaluate_model(model, tokenizer, dataloaders, checkpoint=checkpoint, device=device)
