@@ -23,25 +23,10 @@ if __name__ == "__main__":
     
     wte = model.wte.weight
     
-    mean_embedding_vector = wte.mean(dim=0)
-    mean_embedding_norm = mean_embedding_vector.norm()
-
-    embedding_norms = wte.norm(dim=1)
-
-    mean_norm = embedding_norms.mean()
-    std_norm = embedding_norms.std()
-
-    z_score = mean_embedding_norm.item() / std_norm.item()
-
-    relative_magnitude = mean_embedding_norm.item() / mean_norm.item()
-
-    print(f"Mean Embedding Norm: {mean_embedding_norm.item():.6f}")
-    print(f"Mean of Individual Embedding Norms: {mean_norm.item():.6f}")
-    print(f"Std of Individual Embedding Norms: {std_norm.item():.6f}")
-    print(f"Z-Score: {z_score:.6f}")
-    print(f"Relative Magnitude: {relative_magnitude:.6f}")
-
-    cosine_similarities = F.cosine_similarity(wte, mean_embedding_vector.unsqueeze(0), dim=1)
-    mean_cosine_similarity = cosine_similarities.mean().item()
-
-    print(f"Mean Cosine Similarity to Mean Vector: {mean_cosine_similarity:.6f}")
+    norm_of_mean = wte.mean(dim=0).norm()
+    mean_norm = wte.norm(dim=1).mean()
+    relative_norm = norm_of_mean / mean_norm
+    
+    print(f'Norm of mean: {norm_of_mean}')
+    print(f'Mean norm: {mean_norm}')
+    print(f'Relative norm: {relative_norm}')
