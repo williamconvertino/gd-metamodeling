@@ -27,6 +27,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
     
     if checkpoint is not None:
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
+        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
     else:
         checkpoint = {
             'model_state_dicts': [],
@@ -35,6 +36,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
             'epoch': 0,
             'epoch_len': len(dataloaders['train'])
         }
+        print(f'No checkpoint found, using model [{model.config.get_name()}] with 0 epochs')
     
     train_dataloader = dataloaders['train']
     valid_dataloader = dataloaders['valid']
