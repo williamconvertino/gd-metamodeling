@@ -15,7 +15,7 @@ if __name__ == "__main__":
         assert checkpoint is not None, f"No checkpoint found for model [{model.config.get_name()}]"
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
     
-        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs on device [{model.device}]')
+        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
     
     device = None
     flags = get_flags_from_args()
