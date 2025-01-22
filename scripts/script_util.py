@@ -29,7 +29,7 @@ def get_models_from_name():
         model_type = model_params[0]
         d_seq = int(model_params[1][:-1])
         d_embed = int(model_params[2][:-1])
-        n_heads = int(model_params[3][:-1])
+        n_head = int(model_params[3][:-1])
         n_layer = int(model_params[4][:-1])
         attn_fn = model_params[5]
         use_ff = model_params[5].lower() == 'ff'
@@ -41,7 +41,7 @@ def get_models_from_name():
         assert model_class is not None
         assert model_config_class is not None
         
-        config = model_config_class(d_seq=d_seq, d_embed=d_embed, n_heads=n_heads, n_layer=n_layer, attn_fn=attn_fn, use_ff=use_ff)
+        config = model_config_class(d_seq=d_seq, d_embed=d_embed, n_head=n_head, n_layer=n_layer, attn_fn=attn_fn, use_ff=use_ff)
         
         models.append(model_class(config))
         
