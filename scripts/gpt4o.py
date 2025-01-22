@@ -2,7 +2,6 @@ import setup_paths
 import torch
 from script_util import get_model_from_args, load_checkpoint, get_flags_from_args, get_models_from_name
 from src.datasets import get_dataloaders, get_tokenizer
-from src.evaluation import evaluate_model
 from src.evaluation import generate_gpt4o_inputs, create_batch, check_batch, cancel_batch, parse_batch
 
 if __name__ == "__main__":
