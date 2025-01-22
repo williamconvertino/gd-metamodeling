@@ -103,7 +103,7 @@ def get_request_object(custom_id, content):
     }
 
 
-def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=200):
+def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
   
   test_dataset = dataloaders['test']
   
