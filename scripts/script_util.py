@@ -27,10 +27,10 @@ def get_models_from_name():
         model_name = model_name.replace("'", "").strip()
         model_params = model_name.split('_')
         model_type = model_params[0]
-        context_size = int(model_params[1])
-        d_embed = int(model_params[2])
-        n_heads = int(model_params[3])
-        n_layer = int(model_params[4])
+        context_size = int(model_params[1][:-1])
+        d_embed = int(model_params[2][:-1])
+        n_heads = int(model_params[3][:-1])
+        n_layer = int(model_params[4][:-1])
         attn_fn = model_params[5]
         use_ff = model_params[5].lower() == 'ff'
         
