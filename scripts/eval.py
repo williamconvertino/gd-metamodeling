@@ -17,12 +17,7 @@ if __name__ == "__main__":
     
         print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
     
-    device = None
-    flags = get_flags_from_args()
-    if 'cpu' in flags:
-        device = torch.device('cpu')
-    
     tokenizer = get_tokenizer()
     
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
-    evaluate_models(models, tokenizer, dataloaders, device=device)
+    evaluate_models(models, tokenizer, dataloaders)

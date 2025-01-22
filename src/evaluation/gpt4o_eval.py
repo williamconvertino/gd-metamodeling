@@ -103,7 +103,9 @@ def get_request_object(custom_id, content):
     }
 
 
-def generate_gpt4o_inputs(model, tokenizer, test_dataset, num_generations=10):
+def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=200):
+  
+  test_dataset = dataloaders['test']
   
   i = 0
   num_skipped = 0
@@ -121,43 +123,44 @@ def generate_gpt4o_inputs(model, tokenizer, test_dataset, num_generations=10):
       eos_index = len(sequence) - sequence.tolist()[::-1].index(tokenizer.eos_token_id)
       sequence = sequence[eos_index:] # Trim sequence to include only the most recent story
     
-    input_size = min(model.config.context_size // 2, len(sequence) // 2)
+    input_size = min(models[0].config.context_size // 2, len(sequence) // 2)
 
     model_input = sequence[:input_size]
     
     with torch.no_grad():
-      model.eval()
       
       story_begin = tokenizer.decode(model_input.tolist())
       story_true_end = tokenizer.decode(sequence[input_size:].tolist())
-
-      try:
-        beam_search_sequence = model.beam_search(model_input.unsqueeze(0), eos_token=tokenizer.eos_token_id)
-      except Exception as e:
-        print(f"\rError in beam search for sequence {i}.", end='\n')
-        num_skipped += 1
-        continue
-      
-      beam_search_sequence = beam_search_sequence[0, input_size:].tolist()
-      if tokenizer.eos_token_id in beam_search_sequence:
-        print(f"EOS token found in beam search sequence {i}.")
-        exit()
-        # print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
-      
-      if len(beam_search_sequence) < 2: # Exclude sequences with less than 2 tokens, to avoid confusion in the GPT-4o evaluation
-        print(f"Skipping sequence {i} due to insufficient length.")
-        print(f"Prompt: {tokenizer.decode(model_input.tolist())}")
-        print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
-        num_skipped += 1
-        continue
-
-      story_beam_end = tokenizer.decode(beam_search_sequence)
       
       true_prompt = USER_PROMPT.replace('[STORY_BEGIN]', story_begin).replace('[STORY_END]', story_true_end)
-      beam_prompt = USER_PROMPT.replace('[STORY_BEGIN]', story_begin).replace('[STORY_END]', story_beam_end)
-      
       eval_items.append(get_request_object(f"request_{i}_true", true_prompt))
-      eval_items.append(get_request_object(f"request_{i}_beam", beam_prompt))
+
+      for model in models:
+        try:
+          beam_search_sequence = model.beam_search(model_input.unsqueeze(0), eos_token=tokenizer.eos_token_id)
+        except Exception as e:
+          print(f"\rError in beam search for sequence {i}.", end='\n')
+          num_skipped += 1
+          continue
+      
+        beam_search_sequence = beam_search_sequence[0, input_size:].tolist()
+        if tokenizer.eos_token_id in beam_search_sequence:
+          print(f"EOS token found in beam search sequence {i}.")
+          exit()
+          # print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
+      
+        if len(beam_search_sequence) < 2: # Exclude sequences with less than 2 tokens, to avoid confusion in the GPT-4o evaluation
+          print(f"Skipping sequence {i} due to insufficient length.")
+          print(f"Prompt: {tokenizer.decode(model_input.tolist())}")
+          print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
+          num_skipped += 1
+          continue
+
+        story_beam_end = tokenizer.decode(beam_search_sequence)
+      
+      
+        beam_prompt = USER_PROMPT.replace('[STORY_BEGIN]', story_begin).replace('[STORY_END]', story_beam_end)
+        eval_items.append(get_request_object(f"request_{i}_{model.config.get_name()}", beam_prompt))
       
       i += 1
       time_remaining = get_time_remaining_formatted(start_time, i, num_generations)

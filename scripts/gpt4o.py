@@ -1,6 +1,6 @@
 import setup_paths
 import torch
-from script_util import get_model_from_args, load_checkpoint, get_flags_from_args
+from script_util import get_model_from_args, load_checkpoint, get_flags_from_args, get_models_from_name
 from src.datasets import get_dataloaders, get_tokenizer
 from src.evaluation import evaluate_model
 from src.evaluation import generate_gpt4o_inputs, create_batch, check_batch, cancel_batch, parse_batch
@@ -13,18 +13,20 @@ if __name__ == "__main__":
     
     if 'input' in flags:
         print("Creating inputs")
-        model = get_model_from_args()
-        checkpoint = load_checkpoint(model)
+        models = get_models_from_name()
         
-        device = None
-        flags = get_flags_from_args()
-        if 'cpu' in flags:
-            device = torch.device('cpu')
+        for model in models:
+            checkpoint = load_checkpoint(model)
+            assert checkpoint is not None, f"No checkpoint found for model [{model.config.get_name()}]"
+            model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
+            print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
         
         tokenizer = get_tokenizer()
         model.resize_vocabulary(len(tokenizer))
         
         dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
+        
+        generate_gpt4o_inputs(model, tokenizer, dataloaders)
             
     elif 'batch' in flags:
         print("Creating batch")
