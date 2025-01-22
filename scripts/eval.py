@@ -25,4 +25,4 @@ if __name__ == "__main__":
     tokenizer = get_tokenizer()
     
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
-    evaluate_models(models, tokenizer, dataloaders, checkpoint=checkpoint, device=device)
+    evaluate_models(models, tokenizer, dataloaders, device=device)
