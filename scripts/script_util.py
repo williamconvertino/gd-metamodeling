@@ -32,7 +32,7 @@ def get_models_from_name():
         n_head = int(model_params[3][:-1])
         n_layer = int(model_params[4][:-1])
         attn_fn = model_params[5]
-        use_ff = model_params[5].lower() == 'ff=true'
+        use_ff = model_params[6].lower() == 'ff=true'
         
         model_module = importlib.import_module('src.models')
         model_class = _get_attr_case_insensitive(model_module, model_type)
