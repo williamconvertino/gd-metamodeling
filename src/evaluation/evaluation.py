@@ -30,6 +30,7 @@ def evaluate_models(models, tokenizer, dataloaders, num_generations=20, device=N
     
     for model in models:
         model.eos_token_id = tokenizer.eos_token_id
+        model.device = device
         
     test_dataset = dataloaders['test']
     
