@@ -2,7 +2,7 @@ import setup_paths
 import torch
 from script_util import get_model_from_args, load_checkpoint, get_flags_from_args, get_models_from_name
 from src.datasets import get_dataloaders, get_tokenizer
-from src.evaluation import evaluate_model
+from src.evaluation import evaluate_models
 
 if __name__ == "__main__":
     
@@ -25,4 +25,4 @@ if __name__ == "__main__":
     tokenizer = get_tokenizer()
     
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
-    evaluate_model(model, tokenizer, dataloaders, checkpoint=checkpoint, device=device)
+    evaluate_models(models, tokenizer, dataloaders, checkpoint=checkpoint, device=device)

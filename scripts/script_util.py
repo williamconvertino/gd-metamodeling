@@ -24,6 +24,7 @@ def get_models_from_name():
     model_names = sys.argv[1:]
     models = []
     for model_name in model_names:
+        model_name = model_name.replace("'", "").strip()
         model_params = model_name.split('_')
         model_type = model_params[0]
         context_size = int(model_params[1])

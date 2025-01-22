@@ -1,1 +1,1 @@
-from src.evaluation.evaluation import evaluate_model
+from src.evaluation.evaluation import evaluate_models
