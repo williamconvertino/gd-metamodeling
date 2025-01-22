@@ -1,6 +1,6 @@
 import setup_paths
 import torch
-from script_util import get_model_from_args, load_checkpoint, get_flags_from_args
+from script_util import get_model_from_args, load_checkpoint, get_flags_from_args, get_models_from_name
 from src.datasets import get_dataloaders, get_tokenizer
 from src.evaluation import evaluate_model
 
@@ -8,8 +8,14 @@ if __name__ == "__main__":
     
     torch.manual_seed(0)
     
-    model = get_model_from_args()
-    checkpoint = load_checkpoint(model)
+    models = get_models_from_name()
+    
+    for model in models:
+        checkpoint = load_checkpoint(model)
+        assert checkpoint is not None, f"No checkpoint found for model [{model.config.get_name()}]"
+        model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
+    
+        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs on device [{model.device}]')
     
     device = None
     flags = get_flags_from_args()

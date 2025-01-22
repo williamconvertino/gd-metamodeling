@@ -22,24 +22,16 @@ def generate_ending(model, sequence, use_beam=True):
         
         return output[0].tolist()
     
-def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generations=20, device=None):
+def evaluate_models(models, tokenizer, dataloaders, num_generations=20, device=None):
     
     # Setup
     if device is None:
         device = get_device()
-        
-    model.device = device
-    model.to(device)
-    model.eos_token_id = tokenizer.eos_token_id
     
-    if checkpoint is None:
-        raise ValueError('No checkpoint provided, aborting evaluation')
+    for model in models:
+        model.eos_token_id = tokenizer.eos_token_id
         
-    model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
-    
     test_dataset = dataloaders['test']
-    
-    print(f'Evaluating model [{model.config.get_name()}] with [{checkpoint["epoch"]}] on device [{model.device}]')
     
     num_sequence = 0
     num_failed = 0
@@ -58,16 +50,21 @@ def evaluate_model(model, tokenizer, dataloaders, checkpoint=None, num_generatio
             
             true_beginning_ids = sequence[:sequence_length // 2]
             true_ending_ids = sequence[sequence_length // 2:]
-            generated_ending_ids = generate_ending(model, true_beginning_ids)
             
             true_beginning_text = tokenizer.decode(true_beginning_ids)
             true_ending_text = tokenizer.decode(true_ending_ids)
-            generated_ending_text = tokenizer.decode(generated_ending_ids)
             
             print('*' * 80)
-            print(f'True Story: {true_beginning_text} [{true_ending_text}]')
+            print(f'[True Story]\n{true_beginning_text} [{true_ending_text}]')
             print('=' * 80)
-            print(f'Generated Ending: {true_beginning_text} [{generated_ending_text}]')
+            
+            for model in models:
+                model.eval()
+                model.to(device)
+                generated_ending_ids = generate_ending(model, true_beginning_ids)
+                generated_ending_text = tokenizer.decode(generated_ending_ids)
+                print(f'[{model.config.get_name()}]\n{true_beginning_text} [{generated_ending_text}]')
+                print('=' * 80)
             
             num_sequence += 1
             if num_sequence >= num_generations:

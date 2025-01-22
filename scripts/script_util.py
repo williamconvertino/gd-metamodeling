@@ -12,16 +12,43 @@ def load_checkpoint(model):
         return torch.load(model_path, weights_only=False)
     return None
 
-def get_model_from_args(args=None):
-    if args is None:
-        args = sys.argv[1:]
+def _get_attr_case_insensitive(module, name):
+    name = name.replace('_', '')
+    for attr in dir(module):
+        if attr.lower() == name.lower():
+            return getattr(module, attr)
+    return None
+
+
+def get_models_from_name():
+    model_names = sys.argv[1:]
+    models = []
+    for model_name in model_names:
+        model_params = model_name.split('_')
+        model_type = model_params[0]
+        context_size = int(model_params[1])
+        d_embed = int(model_params[2])
+        n_heads = int(model_params[3])
+        n_layer = int(model_params[4])
+        attn_fn = model_params[5]
+        use_ff = model_params[5].lower() == 'ff'
+        
+        model_module = importlib.import_module('src.models')
+        model_class = _get_attr_case_insensitive(model_module, model_type)
+        model_config_class = _get_attr_case_insensitive(model_module, model_type + 'Config')
+        
+        assert model_class is not None
+        assert model_config_class is not None
+        
+        config = model_config_class(context_size=context_size, d_embed=d_embed, n_heads=n_heads, n_layer=n_layer, attn_fn=attn_fn, use_ff=use_ff)
+        
+        models.append(model_class(config))
+        
+    return models
+        
+def get_model_from_args():
     
-    def _get_attr_case_insensitive(module, name):
-        name = name.replace('_', '')
-        for attr in dir(module):
-            if attr.lower() == name.lower():
-                return getattr(module, attr)
-        return None
+    args = sys.argv[1:]
 
     model_name = args[0]
 
@@ -62,9 +89,8 @@ def get_model_from_args(args=None):
     
     return model_class(config)
 
-def get_flags_from_args(args=None):
-    if args is None:
-        args = sys.argv[1:]
+def get_flags_from_args():
+    args = sys.argv[1:]
     flags = []
     for arg in sys.argv[2:]:
         if '=' in arg:
