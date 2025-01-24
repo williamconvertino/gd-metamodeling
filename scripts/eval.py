@@ -19,11 +19,9 @@ if __name__ == "__main__":
     
     flags = get_flags_from_args()
     
-    use_beam = 'use_beam' in flags
+    use_ngram_skip = 'ngram_skip' in flags
     
     tokenizer = get_tokenizer()
     
-    print('Evaluating models using beam search' if use_beam else 'Evaluating models using top-k search')
-    
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
-    evaluate_models(models, tokenizer, dataloaders, use_beam=use_beam)
+    evaluate_models(models, tokenizer, dataloaders, use_ngram_skip=use_ngram_skip)

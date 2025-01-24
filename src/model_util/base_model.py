@@ -47,7 +47,7 @@ class BaseModel(nn.Module):
         
         return x
 
-    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, ngram_removal=3):
+    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, ngram_skip_size=None):
         
         input_size = x.size(1)
 
@@ -98,8 +98,8 @@ class BaseModel(nn.Module):
                 return False
             
             # Remove n-grams
-            if ngram_removal is not None:
-                ngram_removed_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_removal)]
+            if ngram_skip_size is not None:
+                ngram_removed_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_skip_size)]
                 if len(ngram_removed_sequences) > 0:
                     new_sequences = ngram_removed_sequences
             
