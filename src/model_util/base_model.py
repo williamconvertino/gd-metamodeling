@@ -24,7 +24,7 @@ class BaseModel(nn.Module):
         if hasattr(self, 'wte'):
             self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
-    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=10, temperature=0.3):
+    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=1, temperature=1.0):
         
         input_size = x.size(1)
 
@@ -34,10 +34,7 @@ class BaseModel(nn.Module):
             logits = logits[:, -1, :]
             
             # Select next token based on top-k and temperature
-            logits, _ = torch.topk(logits, top_k, dim=-1)
-            logits = logits * temperature
-            probs = torch.softmax(logits, dim=-1)
-            x_new = torch.multinomial(probs, 1)
+            x_new = torch.multinomial(torch.softmax(logits / temperature, dim=-1), top_k)
             
             x = torch.cat((x, x_new), dim=1)
         
