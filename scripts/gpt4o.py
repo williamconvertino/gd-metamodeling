@@ -12,20 +12,20 @@ if __name__ == "__main__":
     
     if 'input' in flags:
         print("Creating inputs")
+        tokenizer = get_tokenizer()
+        
         models = get_models_from_name()
         
         for model in models:
+            model.resize_vocabulary(len(tokenizer))
             checkpoint = load_checkpoint(model)
             assert checkpoint is not None, f"No checkpoint found for model [{model.config.get_name()}]"
             model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
             print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
         
-        tokenizer = get_tokenizer()
-        model.resize_vocabulary(len(tokenizer))
-        
         dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
         
-        generate_gpt4o_inputs(model, tokenizer, dataloaders)
+        generate_gpt4o_inputs(models, tokenizer, dataloaders)
             
     elif 'batch' in flags:
         print("Creating batch")
