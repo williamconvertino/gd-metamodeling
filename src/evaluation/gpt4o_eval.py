@@ -105,7 +105,7 @@ def get_request_object(custom_id, content):
     }
 
 
-def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
+def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, use_ngram_skip=False):
   client = load_api()
   test_dataset = dataloaders['test']
   
@@ -139,7 +139,7 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
 
       for model in models:
         try:
-          beam_search_sequence = model.beam_search(model_input.unsqueeze(0), eos_token=tokenizer.eos_token_id)
+          beam_search_sequence = model.beam_search(input, max_new_tokens=100, num_beams=3, eos_token_id=model.eos_token_id, ngram_skip_size=3 if use_ngram_skip else None)
         except Exception as e:
           print(f"\rError in beam search for sequence {i}.", end='\n')
           num_skipped += 1
