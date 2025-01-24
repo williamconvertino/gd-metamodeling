@@ -24,7 +24,7 @@ class BaseModel(nn.Module):
         if hasattr(self, 'wte'):
             self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
-    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=10, temperature=1.0):
+    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=10, temperature=0.2):
         
         input_size = x.size(1)
 
