@@ -35,7 +35,7 @@ class BaseModel(nn.Module):
             
             # Select next token based on top-k and temperature
             logits, _ = torch.topk(logits, top_k, dim=-1)
-            logits = logits / temperature
+            logits = logits * temperature
             probs = torch.softmax(logits, dim=-1)
             x_new = torch.multinomial(probs, 1)
             

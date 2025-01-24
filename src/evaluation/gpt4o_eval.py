@@ -14,15 +14,17 @@ MODEL = 'gpt-4o'
 FILE_NAME = f"{MODEL}_eval_input.jsonl"
 BATCH_ID = 'batch_6787360115dc8190825ccb7179b0035f'
 
-env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../.env')
-assert os.path.exists(env_path), ".env file not found at {env_path}."
+def load_api():
+  env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../.env')
+  assert os.path.exists(env_path), ".env file not found at {env_path}."
 
-load_dotenv(env_path)
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+  load_dotenv(env_path)
+  OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
-assert OPENAI_API_KEY is not None, "OpenAI API key not found in .env file."
+  assert OPENAI_API_KEY is not None, "OpenAI API key not found in .env file."
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+  client = OpenAI(api_key=OPENAI_API_KEY)
+  return client
 
 SYSTEM_PROMPT = "You are a writing evaluator designed to assess student story completions. You will be provided children's stories written for a 3-4 year old audience. Your role is to provide constructive, fair, and detailed evaluations based on specific rubric criteria."
 
@@ -104,7 +106,7 @@ def get_request_object(custom_id, content):
 
 
 def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
-  
+  client = load_api()
   test_dataset = dataloaders['test']
   
   i = 0
@@ -173,6 +175,7 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
   print(f"Generated inputs for GPT model:{MODEL}\n Processed {i}, skipped {num_skipped}.")
   
 def create_batch():
+  client = load_api()
   batch_input_file = client.files.create(
     file=open(f'{INPUT_DIR}/{FILE_NAME}_input.jsonl', 'rb'),
     purpose="batch"
@@ -189,6 +192,7 @@ def create_batch():
   print(f"Created batch with ID: {batch.id}")
 
 def check_batch():
+  client = load_api()
   assert BATCH_ID is not None, "Batch ID not provided."
   batch = client.batches.retrieve(BATCH_ID)
   print(f"Batch status: {batch.status}")
@@ -197,11 +201,13 @@ def check_batch():
   # print(f"Batch completion count: {batch.completion_count}")
   
 def cancel_batch():
+  client = load_api()
   assert BATCH_ID is not None, "Batch ID not provided."
   client.batches.cancel(BATCH_ID)
   print(f"Cancelled batch with ID: {BATCH_ID}")
   
 def parse_batch():
+  client = load_api()
   assert BATCH_ID is not None, "Batch ID not provided."
   
   batch = client.batches.retrieve(BATCH_ID)
@@ -253,6 +259,7 @@ def parse_batch():
   num_errors = 0
   
   def parse_score(text, tag):
+    client = load_api()
     text = text.split(f'<{tag}>')[1].split(f'</{tag}>')[0].strip()
     
     if '/' in text:
