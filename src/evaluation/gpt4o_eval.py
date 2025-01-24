@@ -146,7 +146,7 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
         
         model.eval()
         model.to(device)
-        model_input.to(device)
+        model_input = model_input.to(device)
         beam_search_sequence = model.beam_search(model_input, max_new_tokens=100, num_beams=3, eos_token_id=tokenizer.eos_token_id, ngram_skip_size=3 if use_ngram_skip else None)
         
       
