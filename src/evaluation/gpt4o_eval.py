@@ -158,7 +158,7 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
       
         if len(beam_search_sequence) < 2: # Exclude sequences with less than 2 tokens, to avoid confusion in the GPT-4o evaluation
           print(f"Skipping sequence {i} due to insufficient length.")
-          print(f"Prompt: {tokenizer.decode(model_input.tolist())}")
+          print(f"Prompt: {tokenizer.decode(story_begin)}")
           print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
           num_skipped += 1
           continue
