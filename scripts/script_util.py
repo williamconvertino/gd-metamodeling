@@ -95,7 +95,7 @@ def get_model_from_args():
 def get_flags_from_args():
     args = sys.argv[1:]
     flags = []
-    for arg in sys.argv[2:]:
+    for arg in args:
         if '=' in arg:
           continue
         if arg.startswith('--'):
