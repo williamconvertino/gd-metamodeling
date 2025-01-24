@@ -5,7 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 
-from src.util import get_time_remaining_formatted
+from src.util import get_time_remaining_formatted, get_device
 
 INPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/evaluations/input')
 OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/evaluations/output')
@@ -109,6 +109,8 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
   client = load_api()
   test_dataset = dataloaders['test']
   
+  device = get_device()
+  
   i = 0
   num_skipped = 0
   start_time = time.time()
@@ -138,12 +140,15 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
       eval_items.append(get_request_object(f"request_{i}_true", true_prompt))
 
       for model in models:
-        try:
-          beam_search_sequence = model.beam_search(input, max_new_tokens=100, num_beams=3, eos_token_id=model.eos_token_id, ngram_skip_size=3 if use_ngram_skip else None)
-        except Exception as e:
-          print(f"\rError in beam search for sequence {i}.", end='\n')
-          num_skipped += 1
-          continue
+        
+        if isinstance(sequence, list):
+          model_input = torch.tensor(model_input).unsqueeze(0)
+        
+        model.eval()
+        model.to(device)
+        model_input.to(device)
+        beam_search_sequence = model.beam_search(model_input, max_new_tokens=100, num_beams=3, eos_token_id=model.eos_token_id, ngram_skip_size=3 if use_ngram_skip else None)
+        
       
         beam_search_sequence = beam_search_sequence[0, input_size:].tolist()
         if tokenizer.eos_token_id in beam_search_sequence:
