@@ -23,5 +23,7 @@ if __name__ == "__main__":
     
     tokenizer = get_tokenizer()
     
+    print('Evaluating models using beam search' if use_beam else 'Evaluating models using top-k search')
+    
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
     evaluate_models(models, tokenizer, dataloaders, use_beam=use_beam)
