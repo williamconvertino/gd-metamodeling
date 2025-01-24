@@ -131,8 +131,8 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100):
     
     with torch.no_grad():
       
-      story_begin = tokenizer.decode(model_input.tolist())
-      story_true_end = tokenizer.decode(sequence[input_size:].tolist())
+      story_begin = tokenizer.decode(model_input)
+      story_true_end = tokenizer.decode(sequence[input_size:])
       
       true_prompt = USER_PROMPT.replace('[STORY_BEGIN]', story_begin).replace('[STORY_END]', story_true_end)
       eval_items.append(get_request_object(f"request_{i}_true", true_prompt))
