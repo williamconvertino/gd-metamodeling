@@ -24,21 +24,27 @@ class BaseModel(nn.Module):
         if hasattr(self, 'wte'):
             self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
-    def generate(self, x, max_new_tokens=100, eos_token_id=None, return_inputs=False):
+    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=10, temperature=0.3):
         
         input_size = x.size(1)
 
         for _ in range(max_new_tokens):
         
             logits, _ = self(x)
-            x_new = torch.argmax(logits[:, -1, :], dim=-1).unsqueeze(-1)
+            logits = logits[:, -1, :]
+            
+            # Select next token based on top-k and temperature
+            logits, _ = torch.topk(logits, top_k, dim=-1)
+            logits = logits / temperature
+            probs = torch.softmax(logits, dim=-1)
+            x_new = torch.multinomial(probs, 1)
+            
             x = torch.cat((x, x_new), dim=1)
         
             if eos_token_id is not None and x_new.item() == eos_token_id:
                 break
 
-        if not return_inputs:
-            x = x[:, input_size:]
+        x = x[:, input_size:]
         
         return x
 

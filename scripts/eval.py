@@ -17,7 +17,11 @@ if __name__ == "__main__":
     
         print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
     
+    flags = get_flags_from_args()
+    
+    use_beam = 'use_beam' in flags
+    
     tokenizer = get_tokenizer()
     
     dataloaders = get_dataloaders(d_seq=model.config.d_seq, tokenizer=tokenizer, batch_size=64)
-    evaluate_models(models, tokenizer, dataloaders)
+    evaluate_models(models, tokenizer, dataloaders, use_beam=use_beam)
