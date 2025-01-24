@@ -294,4 +294,5 @@ def parse_batch():
     print("Creativity:", avg_scores['creativity'])
     print("Overall:", sum(avg_scores.values()) / 4)
     
-  print(f"Processed {len(output_text.split('\n'))} responses. {num_errors} errors.")
+  num_responses = len(output_text.split('\n'))
+  print(f"Processed {num_responses} responses. {num_errors} errors.")
