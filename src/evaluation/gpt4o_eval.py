@@ -197,8 +197,6 @@ def check_batch():
   batch = client.batches.retrieve(BATCH_ID)
   print(f"Batch status: {batch.status}")
   print(batch)
-  # print(f"Batch status: {batch.status}")
-  # print(f"Batch completion count: {batch.completion_count}")
   
 def cancel_batch():
   client = load_api()
@@ -223,39 +221,12 @@ def parse_batch():
   with open(f'{OUTPUT_DIR}/{FILE_NAME}_output.jsonl', 'w') as f:
     f.write(output_text)
   
-  batch_output = [json.loads(line)['response']['body']['choices'][0]['message']['content'] for line in output_text.split('\n') if line]
+  # batch_output = [json.loads(line)['response']['body']['choices'][0]['message']['content'] for line in output_text.split('\n') if line]
   
-  input_ids = [json.loads(line)['custom_id'] for line in output_text.split('\n') if line]
-  batch_input = [input_text[input_id]['body']['messages'][1]['content'] for input_id in input_ids]
+  # input_ids = [json.loads(line)['custom_id'] for line in output_text.split('\n') if line]
+  # batch_input = [input_text[input_id]['body']['messages'][1]['content'] for input_id in input_ids]
   
-  for i in range(len(batch_output)):
-    if 'true' in input_ids[i]:
-      label = "True Ending"
-    else:
-      label = "Beam Search Ending"
-      
-    print("=" * 100)
-    print(f"Item {i} [{label}]:")
-    print("=" * 100)
-    print("Prompt:")
-    print(batch_input[i])
-    print("Output:")
-    print(batch_output[i])
-  
-  true = {
-    'grammar': [],
-    'consistency': [],
-    'plot': [],
-    'creativity': []
-  }
-  
-  beam = {
-    'grammar': [],
-    'consistency': [],
-    'plot': [],
-    'creativity': []
-  }
-  
+  score_map = {}
   num_errors = 0
   
   def parse_score(text, tag):
@@ -271,64 +242,56 @@ def parse_batch():
       return None
     
     return score
+  
+  for line in output_text.split('\n'):
+    if not line:
+      continue
     
-  for i in range(len(batch_output)):
+    response = json.loads(line)['response']
+    custom_id = response['custom_id']
+    body = response['body']
+    choices = body['choices']
+    message = choices[0]['message']
+    content = message['content']
     
-    grammar_score = parse_score(batch_output[i], 'GRAMMAR_GRADE')
-    consistency_score = parse_score(batch_output[i], 'CONSISTENCY_GRADE')
-    plot_score = parse_score(batch_output[i], 'PLOT_GRADE')
-    creativity_score = parse_score(batch_output[i], 'CREATIVITY_GRADE')
+    grammar_score = parse_score(content, 'GRAMMAR_GRADE')
+    consistency_score = parse_score(content, 'CONSISTENCY_GRADE')
+    plot_score = parse_score(content, 'PLOT_GRADE')
+    creativity_score = parse_score(content, 'CREATIVITY_GRADE')
     
     if None in [grammar_score, consistency_score, plot_score, creativity_score]:
       num_errors += 1
       continue
     
-    if 'true' in input_ids[i]:
-      true['grammar'].append(grammar_score)
-      true['consistency'].append(consistency_score)
-      true['plot'].append(plot_score)
-      true['creativity'].append(creativity_score)
-    else:
-      beam['grammar'].append(grammar_score)
-      beam['consistency'].append(consistency_score)
-      beam['plot'].append(plot_score)
-      beam['creativity'].append(creativity_score)
-    
-  print(true)
-  print(beam)
-    
-  avg_true_scores = {
-    'grammar': sum(true['grammar']) / len(true['grammar']),
-    'consistency': sum(true['consistency']) / len(true['consistency']),
-    'plot': sum(true['plot']) / len(true['plot']),
-    'creativity': sum(true['creativity']) / len(true['creativity'])
-  }
-  
-  avg_beam_scores = {
-    'grammar': sum(beam['grammar']) / len(beam['grammar']),
-    'consistency': sum(beam['consistency']) / len(beam['consistency']),
-    'plot': sum(beam['plot']) / len(beam['plot']),
-    'creativity': sum(beam['creativity']) / len(beam['creativity'])
-  }
-  
-  print("=" * 100)
-  print("Average True Scores:")
-  print("=" * 100)
-  print("Grammar:", avg_true_scores['grammar'])
-  print("Consistency:", avg_true_scores['consistency'])
-  print("Plot:", avg_true_scores['plot'])
-  print("Creativity:", avg_true_scores['creativity'])
-  print("Overall:", sum(avg_true_scores.values()) / 4)
-  
-  print("=" * 100)
-  print("Average Beam Scores:")
-  print("=" * 100)
-  print("Grammar:", avg_beam_scores['grammar'])
-  print("Consistency:", avg_beam_scores['consistency'])
-  print("Plot:", avg_beam_scores['plot'])
-  print("Creativity:", avg_beam_scores['creativity'])
-  print("Overall:", sum(avg_beam_scores.values()) / 4)
-  
-  print(f"Errors: {num_errors}")
+    label = custom_id.split('_')[1:].join('_')
+    if label not in score_map:
+      score_map[label] = {
+        'grammar': [],
+        'consistency': [],
+        'plot': [],
+        'creativity': []
+      }
       
-  print(f"Saved completions to {OUTPUT_DIR}/{FILE_NAME}_output.jsonl")
+    score_map[label]['grammar'].append(grammar_score)
+    score_map[label]['consistency'].append(consistency_score)
+    score_map[label]['plot'].append(plot_score)
+    score_map[label]['creativity'].append(creativity_score)
+    
+  for label, scores in score_map.items():
+    avg_scores = {
+      'grammar': sum(scores['grammar']) / len(scores['grammar']),
+      'consistency': sum(scores['consistency']) / len(scores['consistency']),
+      'plot': sum(scores['plot']) / len(scores['plot']),
+      'creativity': sum(scores['creativity']) / len(scores['creativity'])
+    }
+    
+    print("=" * 100)
+    print(f"Average Scores for {label}:")
+    print("=" * 100)
+    print("Grammar:", avg_scores['grammar'])
+    print("Consistency:", avg_scores['consistency'])
+    print("Plot:", avg_scores['plot'])
+    print("Creativity:", avg_scores['creativity'])
+    print("Overall:", sum(avg_scores.values()) / 4)
+    
+  print(f"Processed {len(output_text.split('\n'))} responses. {num_errors} errors.")
