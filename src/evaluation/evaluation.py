@@ -8,9 +8,13 @@ WEIGHT_DECAY = 1e-2
 
 CHECKPOINT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../data/checkpoints')
 
-def generate_ending(model, sequence, use_beam=False, use_ngram_skip=False):
-    if isinstance(sequence, list):
-        sequence = torch.tensor(sequence).unsqueeze(0)
+def generate_ending(model, tokenizer, sequence, use_beam=False, use_ngram_skip=False):
+    if isinstance(sequence, torch.Tensor):
+        sequence = sequence.tolist()
+        
+    sequence = [token for token in sequence if token != tokenizer.pad_token_id and token != tokenizer.eos_token_id]
+    sequence = torch.tensor(sequence).unsqueeze(0)
+    
     with torch.no_grad():
         model.eval()
         input = sequence.to(model.device)
@@ -62,7 +66,7 @@ def evaluate_models(models, tokenizer, dataloaders, num_generations=20, device=N
             for model in models:
                 model.eval()
                 model.to(device)
-                generated_ending_ids = generate_ending(model, true_beginning_ids, use_beam=use_beam, use_ngram_skip=use_ngram_skip)
+                generated_ending_ids = generate_ending(model, tokenizer, true_beginning_ids, use_beam=use_beam, use_ngram_skip=use_ngram_skip)
                 generated_ending_text = tokenizer.decode(generated_ending_ids)
                 print(f'[{model.config.get_name()}]\n{true_beginning_text} [{generated_ending_text}]')
                 print('=' * 80)
