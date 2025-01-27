@@ -130,11 +130,11 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
     input_size = min(models[0].config.d_seq // 2, len(sequence) // 2)
 
     model_input = sequence[:input_size]
-    model_input = [token for token in model_input if token != tokenizer.pad_token_id]
+    model_input = [token for token in model_input if token != tokenizer.pad_token_id and token != tokenizer.eos_token_id]
     story_begin = tokenizer.decode(model_input)
     
     story_true_end = sequence[input_size:]
-    story_true_end = [token for token in story_true_end if token != tokenizer.pad_token_id]
+    story_true_end = [token for token in story_true_end if token != tokenizer.pad_token_id and token != tokenizer.eos_token_id]
     story_true_end = tokenizer.decode(story_true_end)
     print(f"Model input: {model_input}")
     print(f"Story Begin: {story_begin}")
