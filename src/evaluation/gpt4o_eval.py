@@ -284,6 +284,13 @@ def parse_batch():
     score_map[label]['plot'].append(plot_score)
     score_map[label]['creativity'].append(creativity_score)
     
+  true_scores = {
+    'grammar': sum(score_map['true']['grammar']) / len(score_map['true']['grammar']),
+    'consistency': sum(score_map['true']['consistency']) / len(score_map['true']['consistency']),
+    'plot': sum(score_map['true']['plot']) / len(score_map['true']['plot']),
+    'creativity': sum(score_map['true']['creativity']) / len(score_map['true']['creativity'])
+  }
+    
   for label, scores in score_map.items():
     avg_scores = {
       'grammar': sum(scores['grammar']) / len(scores['grammar']),
@@ -292,14 +299,25 @@ def parse_batch():
       'creativity': sum(scores['creativity']) / len(scores['creativity'])
     }
     
+    avg_scores['overall'] = sum(avg_scores.values()) / 4
+    
+    adjusted_scores = {
+      'grammar': avg_scores['grammar'] / true_scores['grammar'],
+      'consistency': avg_scores['consistency'] / true_scores['consistency'],
+      'plot': avg_scores['plot'] / true_scores['plot'],
+      'creativity': avg_scores['creativity'] / true_scores['creativity']
+    }
+    
+    avg_scores['adjusted'] = sum(adjusted_scores.values()) / 4
+    
     print("=" * 100)
     print(f"Average Scores for {label}:")
     print("=" * 100)
-    print("Grammar:", avg_scores['grammar'])
-    print("Consistency:", avg_scores['consistency'])
-    print("Plot:", avg_scores['plot'])
-    print("Creativity:", avg_scores['creativity'])
-    print("Overall:", sum(avg_scores.values()) / 4)
+    print("Grammar:", avg_scores['grammar'], f"({adjusted_scores['grammar']})")
+    print("Consistency:", avg_scores['consistency'], f"({adjusted_scores['consistency']})")
+    print("Plot:", avg_scores['plot'], f"({adjusted_scores['plot']})")
+    print("Creativity:", avg_scores['creativity'], f"({adjusted_scores['creativity']})")
+    print("Overall:", avg_scores['overall'], f"({avg_scores['adjusted']})")
     
   num_responses = len(output_text.split('\n'))
   print(f"Processed {num_responses} responses. {num_errors} errors.")
