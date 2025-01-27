@@ -241,7 +241,7 @@ def parse_batch():
   def parse_score(text, tag):
     try:
       text = text.split(f'<{tag}>')[1].split(f'</{tag}>')[0].strip()
-    else:
+    except:
       print(f"Error parsing {tag} from text: {text}")
     
     if '/' in text:
