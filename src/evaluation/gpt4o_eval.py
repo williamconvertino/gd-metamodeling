@@ -159,7 +159,8 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
           print(f"EOS token found in beam search sequence {i}.")
           exit()
           # print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
-      
+        
+        beam_search_sequence = [token for token in beam_search_sequence if token != tokenizer.pad_token_id and token != tokenizer.eos_token_id]
         story_beam_end = tokenizer.decode(beam_search_sequence)
       
         if len(story_beam_end) < 4:
