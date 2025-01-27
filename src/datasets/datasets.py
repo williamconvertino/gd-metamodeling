@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import DataLoader
-from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk, config
+from datasets import DatasetDict, load_dataset, concatenate_datasets, load_from_disk
 from transformers import GPT2TokenizerFast
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), '../../data/datasets')
@@ -65,7 +65,7 @@ def generate_dataset_splits():
         generate_tiny_stories_dataset(),
         generate_children_stories_dataset()
     ]
-    
+       
     combined_datasets = DatasetDict({
         'train': concatenate_datasets([dataset['train'] for dataset in datasets]).shuffle(),
         'valid': concatenate_datasets([dataset['valid'] for dataset in datasets]).shuffle(),

@@ -3,22 +3,34 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from dataclasses import dataclass
-from src.model_util import BaseModel, BaseConfig, calculate_attn_scores
+from src.model_util import BaseModel, calculate_attn_scores
 
 @dataclass
-class GPTConfig(BaseConfig):
+class GPTConfig:
     
     # Model Name
     model_name: str = "GPT"
     
+    # Basic Model Parameters
+    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
+    d_seq: int = 256
+    d_embed: int = 512
+    n_head: int = 8
+    n_layer: int = 1
+    
     # Model Parameters
     use_ff: bool = True
-    use_ln_out: bool = True
     attn_fn: str = "softmax"
     
+    # Regularization and Normalization
+    dropout: float = 0.1
+    
     def get_name(self):
-        return f"{super().get_name()}_LN_OUT={self.use_ln_out}_FF={self.use_ff}"
-
+        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L_{self.attn_fn}_FF={self.use_ff}"
+    
+    def __post_init__(self):
+        assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
+        
 class Attention(nn.Module):
 
     def __init__(self, config):
@@ -54,7 +66,6 @@ class Attention(nn.Module):
         
         x = self.ln(x)
         x = x.repeat(1, 1, self.config.n_head).view(B, S, self.config.n_head, self.config.d_embed).transpose(1, 2)
-        
         
         Q = x @ self.W_q
         K = x @ self.W_k
@@ -114,6 +125,8 @@ class GPT(BaseModel):
         self.wte = nn.Embedding(config.d_vocab, config.d_embed)
         self.wpe = nn.Embedding(config.d_seq, config.d_embed)
         
+        self.x_layernorm = nn.LayerNorm(config.d_embed, bias=False)
+        
         self.dropout_e = nn.Dropout(config.dropout)
         self.dropout_p = nn.Dropout(config.dropout)
         
@@ -130,7 +143,7 @@ class GPT(BaseModel):
         nn.init.normal_(self.wte.weight, std=0.02)
         nn.init.normal_(self.wpe.weight, std=0.02)
         
-    def forward(self, x, targets=None, padding_token=None):
+    def forward(self, x, targets=None, pad_token_id=None):
         
         B, S = x.size()
         device = x.device
@@ -144,18 +157,19 @@ class GPT(BaseModel):
         
         x = e + p
         
+        x = self.x_layernorm(x)
+        
         # Attention
         for block in self.attn_blocks:
             x = block(x)
         
-        if self.config.use_ln_out:
-            x = self.ln_out(x)
+        x = self.ln_out(x)
         
         logits = x @ self.wte.weight.transpose(-1, -2)
         
         if targets is None:
             return logits, None
 
-        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=padding_token)
+        loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.contiguous().view(-1), ignore_index=pad_token_id)
         
         return logits, loss

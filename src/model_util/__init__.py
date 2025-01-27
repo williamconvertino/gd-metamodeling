@@ -1,2 +1,2 @@
-from .base_model import BaseModel, BaseConfig
+from .base_model import BaseModel
 from .attn_scores import calculate_attn_scores

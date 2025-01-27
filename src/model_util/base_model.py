@@ -1,34 +1,7 @@
 from dataclasses import dataclass
 import torch
 import torch.nn as nn
-
-@dataclass
-class BaseConfig:
-
-    # Model Name
-    model_name: str
-
-    # Basic Model Parameters
-    d_vocab: int = 50258 # Default value for GPT-2 tokenizer
-    d_seq: int = 256
-    d_embed: int = 512
-    n_head: int = 8
-    n_layer: int = 1
-
-    # Attention
-    attn_fn: str = "softmax"
-
-    # Additional Mechanisms
-    use_ff: bool = True
-
-    # Regularization and Normalization
-    dropout: float = 0.1
-    
-    def get_name(self):
-        return f"{self.model_name}_{self.d_seq}C_{self.d_embed}E_{self.n_head}H_{self.n_layer}L"
-    
-    def __post_init__(self):
-        assert self.attn_fn in ["softmax", "linear", "rbf"], f"Invalid attention function ({self.attn_fn}), must be one of ['softmax', 'linear', 'rbf']"
+from typing import Optional
 
 class BaseModel(nn.Module):
     def __init__(self, config):
@@ -51,25 +24,30 @@ class BaseModel(nn.Module):
         if hasattr(self, 'wte'):
             self.wte = nn.Embedding(d_vocab_new, self.config.d_embed)
 
-    def generate(self, x, max_new_tokens=100, eos_token=None, return_inputs=False):
+    def generate(self, x, max_new_tokens=100, eos_token_id=None, top_k=10, temperature=0.2):
         
         input_size = x.size(1)
 
         for _ in range(max_new_tokens):
         
             logits, _ = self(x)
-            x_new = torch.argmax(logits[:, -1, :], dim=-1).unsqueeze(-1)
+            logits = logits[:, -1, :]
+            
+            # Select next token based on top-k and temperature
+            top_k_logits, top_k_indices = torch.topk(logits / temperature, top_k, dim=-1)
+            top_k_probs = torch.softmax(top_k_logits, dim=-1)
+            x_new = top_k_indices[0, torch.multinomial(top_k_probs, 1).item()].unsqueeze(0).unsqueeze(0) 
+            
             x = torch.cat((x, x_new), dim=1)
         
-            if eos_token is not None and x_new.item() == eos_token:
+            if eos_token_id is not None and x_new.item() == eos_token_id:
                 break
 
-        if not return_inputs:
-            x = x[:, input_size:]
+        x = x[:, input_size:]
         
         return x
 
-    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token=None, return_inputs=False):
+    def beam_search(self, x, max_new_tokens=100, num_beams=3, eos_token_id=None, ngram_skip_size=None):
         
         input_size = x.size(1)
 
@@ -98,7 +76,7 @@ class BaseModel(nn.Module):
                     next_idx = topk.indices[0, i].unsqueeze(0).unsqueeze(0)
                     next_score = topk.values[0, i].item()
                     
-                    if next_idx == eos_token:
+                    if next_idx == eos_token_id:
                         eos = True
                     else:
                         x = torch.cat((x, next_idx), dim=1)
@@ -110,6 +88,21 @@ class BaseModel(nn.Module):
                         'eos': eos
                     })
                 
+            def has_repeated_ngram(sequence, n):
+                ngrams = set()
+                for i in range(len(sequence) - n + 1):
+                    ngram = tuple(sequence[i:i + n].tolist())
+                    if ngram in ngrams:
+                        return True
+                    ngrams.add(ngram)
+                return False
+            
+            # Remove n-grams
+            if ngram_skip_size is not None:
+                ngram_removed_sequences = [seq for seq in new_sequences if not has_repeated_ngram(seq['x'][0], ngram_skip_size)]
+                if len(ngram_removed_sequences) > 0:
+                    new_sequences = ngram_removed_sequences
+            
             # Select beam based on normalized score
             new_sequences.sort(key=lambda seq: seq['score'] / (len(seq['x'][0]) + 1), reverse=True)
             beams = new_sequences[:num_beams]
@@ -122,9 +115,5 @@ class BaseModel(nn.Module):
         
         x = most_probable_sequence['x']
 
-        if not return_inputs:
-            x = x[:, input_size:]
-        
-        return x
-    
+        return x[:, input_size:]
     
