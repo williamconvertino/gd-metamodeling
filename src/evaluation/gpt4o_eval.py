@@ -153,7 +153,7 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
         
         beam_search_sequence = model.beam_search(model_input, max_new_tokens=100, num_beams=3, eos_token_id=tokenizer.eos_token_id, ngram_skip_size=3 if use_ngram_skip else None)
         
-      
+        print(f"Beam search sequence: {beam_search_sequence}")
         beam_search_sequence = beam_search_sequence[0, input_size:].tolist()
         if tokenizer.eos_token_id in beam_search_sequence:
           print(f"EOS token found in beam search sequence {i}.")
@@ -162,7 +162,6 @@ def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, u
       
         if len(beam_search_sequence) < 2: # Exclude sequences with less than 2 tokens, to avoid confusion in the GPT-4o evaluation
           print(f"Skipping sequence {i} due to insufficient length.")
-          print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
           # print(f"Prompt: {tokenizer.decode(story_begin)}")
           # print(f"Beam: {tokenizer.decode(beam_search_sequence)}")
           num_skipped += 1
