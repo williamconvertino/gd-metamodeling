@@ -256,12 +256,7 @@ def parse_batch():
       continue
     response = json.loads(line)
     custom_id = response['custom_id']
-    print(response['response']['body'])
     content = response['response']['body']['choices'][0]['message']['content']
-    # body = response['body']
-    # choices = body['choices']
-    # message = choices[0]['message']
-    # content = message['content']
     
     grammar_score = parse_score(content, 'GRAMMAR_GRADE')
     consistency_score = parse_score(content, 'CONSISTENCY_GRADE')
@@ -272,7 +267,7 @@ def parse_batch():
       num_errors += 1
       continue
     
-    label = custom_id.split('_')[2:].join('_')
+    label = '_'.join(custom_id.split('_')[2:])
     if label not in score_map:
       score_map[label] = {
         'grammar': [],
