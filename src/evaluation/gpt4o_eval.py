@@ -222,7 +222,10 @@ def parse_batch():
   
   with open(f'{INPUT_DIR}/{FILE_NAME}_input.jsonl', 'r') as f:
     input_jsons = [json.loads(line) for line in f.readlines()]
-    print(input_jsons[0])
+    input_texts = {
+      input_json['custom_id']: input_json['body']['messages'][1]['content'] for input_json in input_jsons
+    }
+    print(input_texts)
   
   return
   input_text = {json.loads(line)['custom_id']: json.loads(line) for line in input_text.split('\n') if line}
