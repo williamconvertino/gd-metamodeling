@@ -225,13 +225,10 @@ def parse_batch():
     input_texts = {
       input_json['custom_id']: input_json['body']['messages'][1]['content'] for input_json in input_jsons
     }
-    print(input_texts)
-  
-  return
-  input_text = {json.loads(line)['custom_id']: json.loads(line) for line in input_text.split('\n') if line}
   os.makedirs(OUTPUT_DIR, exist_ok=True)
   with open(f'{OUTPUT_DIR}/{FILE_NAME}_output.jsonl', 'w') as f:
     f.write(output_text)
+    print("Wrote output to file.")
   
   # batch_output = [json.loads(line)['response']['body']['choices'][0]['message']['content'] for line in output_text.split('\n') if line]
   
@@ -242,7 +239,6 @@ def parse_batch():
   num_errors = 0
   
   def parse_score(text, tag):
-    client = load_api()
     text = text.split(f'<{tag}>')[1].split(f'</{tag}>')[0].strip()
     
     if '/' in text:
