@@ -255,12 +255,13 @@ def parse_batch():
     if not line:
       continue
     response = json.loads(line)
-    print(response)
     custom_id = response['custom_id']
-    body = response['body']
-    choices = body['choices']
-    message = choices[0]['message']
-    content = message['content']
+    print(response['response']['body'])
+    content = response['response']['body']['choices'][0]['message']['content']
+    # body = response['body']
+    # choices = body['choices']
+    # message = choices[0]['message']
+    # content = message['content']
     
     grammar_score = parse_score(content, 'GRAMMAR_GRADE')
     consistency_score = parse_score(content, 'CONSISTENCY_GRADE')
