@@ -254,9 +254,9 @@ def parse_batch():
   for line in output_text.split('\n'):
     if not line:
       continue
-    print(line)
+    response = json.loads(line)
+    print(response)
     return
-    response = json.loads(line)['response']
     custom_id = response['custom_id']
     body = response['body']
     choices = body['choices']
