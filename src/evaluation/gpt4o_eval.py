@@ -12,7 +12,7 @@ OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../dat
 
 MODEL = 'gpt-4o'
 FILE_NAME = f"{MODEL}_eval_input.jsonl"
-BATCH_ID = 'batch_6787360115dc8190825ccb7179b0035f'
+BATCH_ID = 'batch_6797979eff28819093dbc99c1bc62207'
 
 def load_api():
   env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../.env')
