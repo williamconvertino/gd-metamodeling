@@ -78,6 +78,7 @@ def get_tokenizer():
     tokenizer = GPT2TokenizerFast.from_pretrained('openai-community/gpt2')
     tokenizer.add_special_tokens({'pad_token': '<|pad|>'})        
     tokenizer.name = 'gpt2-tokenizer'
+    print(f'Loaded tokenizer: {tokenizer.name} with {tokenizer.vocab_size} tokens')
     return tokenizer
 
 def get_dataloaders(d_seq, tokenizer, batch_size):
