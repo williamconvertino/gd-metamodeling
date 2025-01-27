@@ -10,10 +10,15 @@ train_dataloader = dataloaders['train']
 total_tokens_including_padding = 0
 total_tokens_excluding_padding = 0
 
+num_batches = len(train_dataloader)
+
 for i, batch in enumerate(train_dataloader):
     tokens = batch['input_ids']
     total_tokens_including_padding += tokens.numel()
     total_tokens_excluding_padding += tokens[tokens != tokenizer.pad_token_id].numel()
+    
+    if i % 10 == 0:
+        print(f'\rProcessed {i}/{num_batches} batches', end='')
     
 print(f'Total tokens including padding: {total_tokens_including_padding}')
 print(f'Total tokens excluding padding: {total_tokens_excluding_padding}')
