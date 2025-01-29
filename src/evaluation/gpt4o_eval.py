@@ -105,7 +105,7 @@ def get_request_object(custom_id, content):
     }
 
 
-def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=100, use_ngram_skip=False):
+def generate_gpt4o_inputs(models, tokenizer, dataloaders, num_generations=200, use_ngram_skip=False):
   client = load_api()
   test_dataset = dataloaders['test']
   
