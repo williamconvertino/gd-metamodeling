@@ -15,9 +15,8 @@ if __name__ == "__main__":
         assert checkpoint is not None, f"No checkpoint found for model [{model.config.get_name()}]"
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
     
-        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
-        print(f'[Number of parameters] With embeddings: {model.get_num_params()} Without embeddings: {model.get_num_params(include_embeddings=False)}')
-    
+        print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs and [{model.get_num_params_formatted()}] parameters')
+        
     flags = get_flags_from_args()
     
     use_ngram_skip = 'ngram_skip' in flags
