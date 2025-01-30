@@ -21,9 +21,8 @@ class BaseModel(nn.Module):
     
     def get_num_params_formatted(self):
         print(self.config.get_name())
-        for param in self.parameters():
-            print(param)
-            print(param.size())
+        for param, name in self.named_parameters():
+            print(name)
             
         num_params = self.get_num_params()
         num_embed = self.wte.weight.numel() if hasattr(self, 'wte') else 0
