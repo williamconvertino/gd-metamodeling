@@ -23,7 +23,8 @@ class BaseModel(nn.Module):
         print(self.config.get_name())
         for param, name in self.named_parameters():
             print(name)
-            
+            print(param.size())
+                        
         num_params = self.get_num_params()
         num_embed = self.wte.weight.numel() if hasattr(self, 'wte') else 0
         num_pos_embed = self.wpe.weight.numel() if hasattr(self, 'wpe') else 0
