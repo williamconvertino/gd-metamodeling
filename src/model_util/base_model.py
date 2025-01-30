@@ -23,10 +23,11 @@ class BaseModel(nn.Module):
         num_params = self.get_num_params()
         num_embed = self.wte.weight.numel() if hasattr(self, 'wte') else 0
         num_pos_embed = self.wpe.weight.numel() if hasattr(self, 'wpe') else 0
+        non_embed_params = num_params - num_embed - num_pos_embed
         num_params = f"{num_params / 1e6:.2f}M" if num_params > 1e6 else num_params
         num_embed = f"{num_embed / 1e6:.2f}M" if num_embed > 1e6 else num_embed
         num_pos_embed = f"{num_pos_embed / 1e6:.2f}M" if num_pos_embed > 1e6 else num_pos_embed
-        non_embed_params = num_params - num_embed - num_pos_embed
+        non_embed_params = f"{non_embed_params / 1e6:.2f}M" if non_embed_params > 1e6 else non_embed_params
         return f"Total: {num_params} Embeddings: {num_embed} Pos Embeddings: {num_pos_embed} Non-Embeddings: {non_embed_params}"
 
     def resize_vocabulary(self, d_vocab_new):
