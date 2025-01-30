@@ -21,7 +21,7 @@ class BaseModel(nn.Module):
     
     def get_num_params_formatted(self):
         print(self.config.get_name())
-        for param, name in self.named_parameters():
+        for name, param in self.named_parameters():
             print(name)
             print(param.size())
                         
