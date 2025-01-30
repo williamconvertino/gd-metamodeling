@@ -29,11 +29,17 @@ class BaseModel(nn.Module):
         num_embed = self.wte.weight.numel() if hasattr(self, 'wte') else 0
         num_pos_embed = self.wpe.weight.numel() if hasattr(self, 'wpe') else 0
         non_embed_params = num_params - num_embed - num_pos_embed
+        w_qkv_params = 0
+        w_qkv_params += self.W_q_diag.numel() if hasattr(self, 'W_q_diag') else 0
+        w_qkv_params += self.W_k_diag.numel() if hasattr(self, 'W_k_diag') else 0
+        w_qkv_params += self.W_q.numel() if hasattr(self, 'W_q') else 0
+        w_qkv_params += self.W_k.numel() if hasattr(self, 'W_k') else 0
+        w_qkv_params += self.W_v.numel() if hasattr(self, 'W_v') else 0
         num_params = f"{num_params / 1e6:.2f}M" if num_params > 1e6 else num_params
         num_embed = f"{num_embed / 1e6:.2f}M" if num_embed > 1e6 else num_embed
         num_pos_embed = f"{num_pos_embed / 1e6:.2f}M" if num_pos_embed > 1e6 else num_pos_embed
         non_embed_params = f"{non_embed_params / 1e6:.2f}M" if non_embed_params > 1e6 else non_embed_params
-        return f"Total: {num_params} Embeddings: {num_embed} Pos Embeddings: {num_pos_embed} Non-Embeddings: {non_embed_params}"
+        return f"Total: {num_params} Embeddings: {num_embed} Pos Embeddings: {num_pos_embed} Non-Embeddings: {non_embed_params} W_qkv: {w_qkv_params}"
 
     def resize_vocabulary(self, d_vocab_new):
         self.config.d_vocab = d_vocab_new
