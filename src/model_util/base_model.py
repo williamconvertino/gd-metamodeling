@@ -12,11 +12,15 @@ class BaseModel(nn.Module):
     def forward(self, x):
         raise NotImplementedError
 
-    def get_num_params(self):
-        return sum(p.numel() for p in self.parameters())
+    def get_num_params(self, include_embeddings=True):
+        num_params = sum(p.numel() for p in self.parameters())
+        if not include_embeddings:
+            if hasattr(self, 'wte'):
+                num_params -= self.wte.weight.numel()
+        return num_params
     
-    def get_num_params_formatted(self):
-        num_params = self.get_num_params()
+    def get_num_params_formatted(self, include_embeddings=True):
+        num_params = self.get_num_params(include_embeddings)
         return f"{num_params / 1e6:.2f}M" if num_params > 1e6 else num_params
 
     def resize_vocabulary(self, d_vocab_new):

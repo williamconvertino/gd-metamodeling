@@ -16,6 +16,7 @@ if __name__ == "__main__":
         model.load_state_dict(checkpoint['model_state_dicts'][checkpoint['epoch']])
     
         print(f'Loaded model [{model.config.get_name()}] with [{checkpoint["epoch"]}] epochs')
+        print(f'[Number of parameters] With embeddings: {model.get_num_params()} Without embeddings: {model.get_num_params(include_embeddings=False)}')
     
     flags = get_flags_from_args()
     
