@@ -86,8 +86,9 @@ class GD(BaseModel):
         for W_o in self.W_o_list:
             nn.init.normal_(W_o, std=0.02 / math.sqrt(2 * self.config.n_layer))
         if self.config.use_ff:
-            nn.init.normal_(self.ff[1].weight, std=0.02)
-            nn.init.normal_(self.ff[3].weight, std=0.02)
+            for ff in self.ff_list:
+                nn.init.normal_(ff[1].weight, std=0.02)
+                nn.init.normal_(ff[3].weight, std=0.02)
 
     def calculate_E_wte(self, f_k):
         
