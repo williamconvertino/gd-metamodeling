@@ -10,9 +10,10 @@ def calculate_attn_scores(Q, K, d_embed, gamma=None, attn_fn="softmax"):
     
     causal_mask = torch.tril(torch.ones(S, S, device=device), diagonal=0).view(1, S, S).bool().logical_not()
     attn_scaling = 1.0 / math.sqrt(d_embed) # Dividing by sqrt(d_embed) helps stabilize training, common in GPT models 
-    print(attn_scaling)
+
     if attn_fn == "linear":
         attn_scores = torch.matmul(Q, K.transpose(-1, -2))
+        print(attn_scores)
         attn_scores = attn_scores * attn_scaling
         attn_scores = attn_scores.masked_fill(causal_mask, 0.0)
     elif attn_fn == "rbf":
