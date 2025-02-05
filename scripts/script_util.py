@@ -82,6 +82,7 @@ def get_model_from_args():
         # Check all fields in the hierarchy
         all_fields = {field.name for field in get_all_fields(model_config_class)}
         if key in all_fields:
+            print(key, value)
             if type(getattr(config, key)) == int:
                 value = int(value)
             elif type(getattr(config, key)) == bool:
@@ -89,7 +90,6 @@ def get_model_from_args():
                 setattr(config, key, value)
             else:
                 setattr(config, key, value)
-        print(config.n_layer)
     return model_class(config)
 
 def get_flags_from_args():
