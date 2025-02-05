@@ -39,8 +39,8 @@ class GD(BaseModel):
         self.wte = nn.Embedding(config.d_vocab, config.d_embed)
         self.wpe = nn.Embedding(config.d_seq + 1, config.d_embed)
         
-        self.wte_layernorm = nn.LayerNorm(config.d_embed, bias=False)
-        self.wpe_layernorm = nn.LayerNorm(config.d_embed, bias=False)
+        self.wte_layernorm = nn.LayerNorm(config.d_embed, bias=True)
+        self.wpe_layernorm = nn.LayerNorm(config.d_embed, bias=True)
         
         # Attention
         self.W_q_diag = self.W_k_diag = nn.Parameter(torch.zeros(config.n_head, config.d_embed)) # W_q = W_k and is diagonal
@@ -62,7 +62,7 @@ class GD(BaseModel):
         if config.use_ff:
             self.ff_list = nn.ModuleList([
                 nn.Sequential(
-                    nn.LayerNorm(config.d_embed, bias=False),
+                    nn.LayerNorm(config.d_embed, bias=True),
                     nn.Linear(config.d_embed, 4 * config.d_embed, bias=False),
                     nn.GELU(),
                     nn.Linear(4 * config.d_embed, config.d_embed, bias=False),
@@ -71,7 +71,7 @@ class GD(BaseModel):
             ])
 
         # Output
-        self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
+        self.ln_out = nn.LayerNorm(config.d_embed, bias=True)
 
         self._init_weights()
         print(f"Initialized model {self.name} with {self.get_num_params_formatted()} parameters")
@@ -156,9 +156,7 @@ class GD(BaseModel):
         f_k = self.ln_out(f_k)
         
         logits = f_k @ self.wte_layernorm(self.wte.weight).transpose(-1, -2) # Layernorm on wte output is not strictly necessary, but it makes the layernorm on e more consistent with GD theory
-        if logits.isnan().any():
-            print("Logits contain NaN values")
-            print(f_k)
+        
         if targets is None:
             return logits, None
 
