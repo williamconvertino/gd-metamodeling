@@ -13,7 +13,6 @@ def calculate_attn_scores(Q, K, d_embed, gamma=None, attn_fn="softmax"):
 
     if attn_fn == "linear":
         attn_scores = torch.matmul(Q, K.transpose(-1, -2))
-        print(attn_scores)
         attn_scores = attn_scores * attn_scaling
         attn_scores = attn_scores.masked_fill(causal_mask, 0.0)
     elif attn_fn == "rbf":

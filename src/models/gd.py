@@ -140,6 +140,7 @@ class GD(BaseModel):
             delta_f_k = self.drop_gd(delta_f_k)
         
             f_k[:, 1:, :] = f_k[:, 1:, :] + delta_f_k.transpose(1, 2)
+            print(f_k)
             
             if self.config.use_ff:
                 f_k = f_k + self.ff(f_k)
