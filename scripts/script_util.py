@@ -69,7 +69,7 @@ def get_model_from_args():
         if len(s) != 2:
             continue
         key, value = s
-        
+        print(key, value)
         def get_all_fields(dataclass):
             # Collect all fields from a dataclass and its parent dataclasses
             if not is_dataclass(dataclass):
