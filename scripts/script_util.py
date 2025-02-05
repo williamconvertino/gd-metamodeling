@@ -69,7 +69,7 @@ def get_model_from_args():
         if len(s) != 2:
             continue
         key, value = s
-        print(key, value)
+
         def get_all_fields(dataclass):
             # Collect all fields from a dataclass and its parent dataclasses
             if not is_dataclass(dataclass):
@@ -89,7 +89,7 @@ def get_model_from_args():
                 setattr(config, key, value)
             else:
                 setattr(config, key, value)
-    
+        print(config.n_layer)
     return model_class(config)
 
 def get_flags_from_args():
