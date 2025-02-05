@@ -140,15 +140,15 @@ class GD(BaseModel):
             delta_f_k = self.drop_gd(delta_f_k)
         
             f_k[:, 1:, :] = f_k[:, 1:, :] + delta_f_k.transpose(1, 2)
+            
+            if self.config.use_ff:
+                f_k = f_k + self.ff(f_k)
         
         # Output
         if targets is None:
             f_k = f_k[:, [-1], :] # Only consider last token for optimized generation
         else:
             f_k = f_k[:, 1:, :]
-            
-        if self.config.use_ff:
-            f_k = f_k + self.ff(f_k)
             
         f_k = self.ln_out(f_k)
         
