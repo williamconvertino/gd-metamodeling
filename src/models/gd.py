@@ -60,13 +60,15 @@ class GD(BaseModel):
         
         # Feed Forward
         if config.use_ff:
-            self.ff = nn.Sequential(
-                nn.LayerNorm(config.d_embed, bias=False),
-                nn.Linear(config.d_embed, 4 * config.d_embed, bias=False),
-                nn.GELU(),
-                nn.Linear(4 * config.d_embed, config.d_embed, bias=False),
-                nn.Dropout(config.dropout)
-            )
+            self.ff_list = nn.ModuleList([
+                nn.Sequential(
+                    nn.LayerNorm(config.d_embed, bias=False),
+                    nn.Linear(config.d_embed, 4 * config.d_embed, bias=False),
+                    nn.GELU(),
+                    nn.Linear(4 * config.d_embed, config.d_embed, bias=False),
+                    nn.Dropout(config.dropout)
+                ) for _ in range(config.n_layer)
+            ])
 
         # Output
         self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
@@ -140,10 +142,9 @@ class GD(BaseModel):
             delta_f_k = self.drop_gd(delta_f_k)
         
             f_k[:, 1:, :] = f_k[:, 1:, :] + delta_f_k.transpose(1, 2)
-            print(f_k)
             
             if self.config.use_ff:
-                f_k = f_k + self.ff(f_k)
+                f_k = f_k + self.ff_list[k](f_k)
         
         # Output
         if targets is None:
