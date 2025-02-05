@@ -5,7 +5,6 @@ from torch.nn import functional as F
 from dataclasses import dataclass
 from src.model_util import BaseModel, calculate_attn_scores
 
-
 @dataclass
 class HybridConfig:
     
@@ -155,6 +154,16 @@ class Hybrid(BaseModel):
                     nn.Dropout(config.dropout)
                 ) for _ in range(config.n_layer)
             ])
+        
+        def calculate_E_wte(self, f_k):
+        
+            g = f_k @ self.wte.weight.transpose(-1, -2) 
+            g = torch.exp(g)
+            
+            numerator = g @ self.wte.weight
+            denominator = g.sum(dim=-1, keepdim=True)
+            
+            return numerator / denominator
 
         self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
 
