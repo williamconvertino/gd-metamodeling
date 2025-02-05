@@ -120,44 +120,43 @@ class TransformerBlock(nn.Module):
         return x
 
 class Hybrid(BaseModel):
-    def __init__(self, gd_config, gpt_config):
-        super().__init__(gd_config)  # Using GD as the base configuration
+    def __init__(self, config):
+        super().__init__(config)  # Using GD as the base configuration
 
-        self.gd_config = gd_config
-        self.gpt_config = gpt_config
+        self.config = config
 
         # Embedding
-        self.wte = nn.Embedding(gd_config.d_vocab, gd_config.d_embed)
-        self.wpe = nn.Embedding(gd_config.d_seq, gd_config.d_embed)
+        self.wte = nn.Embedding(config.d_vocab, config.d_embed)
+        self.wpe = nn.Embedding(config.d_seq, config.d_embed)
 
-        self.x_layernorm = nn.LayerNorm(gd_config.d_embed, bias=False)
+        self.x_layernorm = nn.LayerNorm(config.d_embed, bias=False)
 
         # Transformer Block from GPT
-        self.transformer_block = TransformerBlock(gpt_config)
+        self.transformer_block = TransformerBlock(config)
 
         # Gradient Descent-based Attention
-        self.W_q_diag = self.W_k_diag = nn.Parameter(torch.zeros(gd_config.n_head, gd_config.d_embed))
+        self.W_q_diag = self.W_k_diag = nn.Parameter(torch.zeros(config.n_head, config.d_embed))
         self.W_o_list = nn.ParameterList([
-            nn.Parameter(torch.zeros(gd_config.d_embed * gd_config.n_head, gd_config.d_embed))
-            for _ in range(gd_config.n_layer)
+            nn.Parameter(torch.zeros(config.d_embed * config.n_head, config.d_embed))
+            for _ in range(config.n_layer)
         ])
 
-        self.drop_attn = nn.Dropout(gd_config.dropout)
-        self.drop_gd = nn.Dropout(gd_config.dropout)
+        self.drop_attn = nn.Dropout(config.dropout)
+        self.drop_gd = nn.Dropout(config.dropout)
 
         # Feed Forward (if enabled)
-        if gd_config.use_ff:
+        if config.use_ff:
             self.ff_list = nn.ModuleList([
                 nn.Sequential(
-                    nn.LayerNorm(gd_config.d_embed, bias=False),
-                    nn.Linear(gd_config.d_embed, 4 * gd_config.d_embed, bias=False),
+                    nn.LayerNorm(config.d_embed, bias=False),
+                    nn.Linear(config.d_embed, 4 * config.d_embed, bias=False),
                     nn.GELU(),
-                    nn.Linear(4 * gd_config.d_embed, gd_config.d_embed, bias=False),
-                    nn.Dropout(gd_config.dropout)
-                ) for _ in range(gd_config.n_layer)
+                    nn.Linear(4 * config.d_embed, config.d_embed, bias=False),
+                    nn.Dropout(config.dropout)
+                ) for _ in range(config.n_layer)
             ])
 
-        self.ln_out = nn.LayerNorm(gd_config.d_embed, bias=False)
+        self.ln_out = nn.LayerNorm(config.d_embed, bias=False)
 
         self._init_weights()
 
@@ -167,8 +166,8 @@ class Hybrid(BaseModel):
         nn.init.normal_(self.W_q_diag, std=0.02)
         nn.init.normal_(self.W_k_diag, std=0.02)
         for W_o in self.W_o_list:
-            nn.init.normal_(W_o, std=0.02 / math.sqrt(2 * self.gd_config.n_layer))
-        if self.gd_config.use_ff:
+            nn.init.normal_(W_o, std=0.02 / math.sqrt(2 * self.config.n_layer))
+        if self.config.use_ff:
             for ff in self.ff_list:
                 nn.init.normal_(ff[1].weight, std=0.02)
                 nn.init.normal_(ff[3].weight, std=0.02)
@@ -188,9 +187,9 @@ class Hybrid(BaseModel):
         x = self.transformer_block(x)
 
         # Gradient Descent Attention (GD-style processing)
-        f_k = torch.zeros((B, S + 1, self.gd_config.d_embed), device=device)
+        f_k = torch.zeros((B, S + 1, self.config.d_embed), device=device)
 
-        for k in range(self.gd_config.n_layer):
+        for k in range(self.config.n_layer):
             E_wte = self.calculate_E_wte(f_k[:, :-1, :])
 
             V = x - E_wte  # Use GPT transformer output as values
@@ -198,13 +197,13 @@ class Hybrid(BaseModel):
             delta_f_k = calculate_attn_scores(
                 x @ torch.diag_embed(self.W_q_diag),
                 x @ torch.diag_embed(self.W_k_diag),
-                self.gd_config.d_embed
+                self.config.d_embed
             ) @ V.unsqueeze(1)
 
             delta_f_k = self.drop_gd(delta_f_k)
             f_k[:, 1:, :] = f_k[:, 1:, :] + delta_f_k.squeeze(1)
 
-            if self.gd_config.use_ff:
+            if self.config.use_ff:
                 f_k = f_k + self.ff_list[k](f_k)
 
         f_k = self.ln_out(f_k[:, 1:, :])
