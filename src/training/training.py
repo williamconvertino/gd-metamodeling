@@ -1,6 +1,7 @@
 import os
 from tqdm import tqdm
 import torch
+from torch.nn.utils import clip_grad_norm_
 from src.util import get_device
 
 LEARNING_RATE = 1e-3
@@ -65,6 +66,7 @@ def train_model(model, tokenizer, dataloaders, checkpoint=None, max_epochs=None,
                 
                 train_loss = model_forward(model, batch)
                 train_loss.backward()
+                clip_grad_norm_(model.parameters(), 1.0)
                 train_loss = train_loss.item()
                 optimizer.step()
                 
