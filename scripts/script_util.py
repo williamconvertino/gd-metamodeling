@@ -82,9 +82,9 @@ def get_model_from_args():
         # Check all fields in the hierarchy
         all_fields = {field.name for field in get_all_fields(model_config_class)}
         if key in all_fields:
-            print(key, value)
             if type(getattr(config, key)) == int:
                 value = int(value)
+                setattr(config, key, value)
             elif type(getattr(config, key)) == bool:
                 value = value.lower() == 'true'
                 setattr(config, key, value)
