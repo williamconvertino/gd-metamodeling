@@ -20,11 +20,6 @@ class BaseModel(nn.Module):
         return num_params
     
     def get_num_params_formatted(self):
-        print(self.config.get_name())
-        for name, param in self.named_parameters():
-            print(name)
-            print(param.size())
-                        
         num_params = self.get_num_params()
         num_embed = self.wte.weight.numel() if hasattr(self, 'wte') else 0
         num_pos_embed = self.wpe.weight.numel() if hasattr(self, 'wpe') else 0
