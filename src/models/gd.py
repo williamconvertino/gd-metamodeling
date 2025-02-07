@@ -144,6 +144,8 @@ class GD(BaseModel):
         
             f_k[:, 1:, :] = f_k[:, 1:, :] + delta_f_k.transpose(1, 2)
             
+            assert not torch.isnan(f_k).any(), f"NaN in f_k: \n{f_k}"
+            
             if self.config.use_ff:
                 f_k = f_k + self.ff_list[k](f_k)
         
